@@ -1,5 +1,7 @@
+import time
 import wikipedia
 import requests
+import json
 
 '''
 ny = wikipedia.suggest("inter") # return string of a suggestion for search returns a string
@@ -29,14 +31,20 @@ wikipedia.set_rate_limiting() # set minimum waiting time for getting result from
 ny = wikipedia.summary('internet', 0,150) # first param is the page title to summarize second if less than 10 and not equal 0 or less
 print(ny)
 '''
-title = 'Internet'
+title = input()
+t1 = time.time()
 page = wikipedia.page(title)
+t2 = time.time()
+print(t2 - t1)
 content = page.content
+t3 = time.time()
+print(t3 - t2)
+
 list_of_content = []
 list_of_sections = {}
 list_of_con_sum = {}
-html = page.html()
-cat = page.categories
+#html = page.html()
+#cat = page.categories
 
 for item in content.split("\n"):
     if "==" in item:
@@ -60,13 +68,15 @@ for it in list_of_sections:
 
     list_of_con_sum[it] = final_text
 
-for key in list_of_con_sum:
-    print(key)
-    print(list_of_con_sum[key][3:])
-    print()
+json_topic_sum = json.dumps(list_of_con_sum)
+json_topics = json.dumps(list_of_content)
+print(json_topics)
 
-print()
-print()
+#for key in list_of_con_sum:
+    #print(key)
+    #print(list_of_con_sum[key][3:])
+    #print()
+
 #for key in list_of_sections:
 #    if len(list_of_sections[key]) < 1:
     #    print(key)
