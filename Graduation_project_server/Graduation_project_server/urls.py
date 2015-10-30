@@ -8,5 +8,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'Graduation_project_server.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', views.home_page, name='home'),
+    url(r'^D3/$', views.d3_page, name='d3'),
+    url(r'^Visjs/', views.visjs_page, name='visjs'),
     #url(r'^admin/', include(admin.site.urls)),
 )

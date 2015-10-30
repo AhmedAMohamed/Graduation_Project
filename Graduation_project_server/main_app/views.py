@@ -4,3 +4,9 @@ from django.shortcuts import render
 
 def home_page(request):
 	return render(request, 'home.html')
+
+def d3_page(request):
+	return render(request, 'd3.html')
+
+def visjs_page(request):
+	return render(request, 'Visjs.html')
