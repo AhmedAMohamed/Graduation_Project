@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 
 {% block body %}
-	<h1>Welcome to graduation project</h1>
-	<button onclick="location.href='/D3/'">D3</button>
-	<button onclick="location.href='/Visjs/'">Vis.js</button>
+	<div class="row">
+		<h1 class="text-center">Welcome to graduation project</h1>
+	</div>
+	<div class ="row">
+		<div class="small-3 small-centered large-centered columns">
+			<ul class="stack-for-small round button-group center">
+				<li><a href="/D3/" class="button">D3</a></li>
+				<li><a href="/Visjs/" class="button">Vis.js</a></li>
+			</ul>
+		</div>
+	</div>
 {% endblock %}

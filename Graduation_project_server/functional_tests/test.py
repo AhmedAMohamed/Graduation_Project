@@ -34,7 +34,7 @@ class HomePageTest(StaticLiveServerTestCase):
 			'Wrong title: %s.' % self.browser.title)
 
 		#User sees 2 buttons
-		buttons = self.browser.find_elements_by_tag_name('button')
+		buttons = self.browser.find_elements_by_tag_name('a')
 		self.assertEqual(len(buttons), 2, 'Missing buttons')
 
 		#First button leads to a new page
@@ -50,7 +50,7 @@ class HomePageTest(StaticLiveServerTestCase):
 			'Should be %s url instead %s' % (home_page_url, self.browser.current_url,))
 
 		#User still sees 2 buttons
-		buttons = self.browser.find_elements_by_tag_name('button')
+		buttons = self.browser.find_elements_by_tag_name('a')
 		self.assertEqual(len(buttons), 2, 'Missing buttons')
 
 		#Second button leads to another page
@@ -62,7 +62,17 @@ class HomePageTest(StaticLiveServerTestCase):
 		self.assertNotEqual(first_button, second_button_url,
 			'second url is the same as the first button')
 
+	def test_layout_is_loaded_correctly(self):
+		self.browser.get(self.server_url)
+		self.browser.set_window_size(1024, 768)
 
+		title = self.browser.find_element_by_tag_name('h1')
+		self.assertNotAlmostEqual(title.location['x'], 0, delta=15)
+		self.assertAlmostEqual(
+			title.location['x'] + title.size['width'] / 2,
+			512,
+			delta=5
+		)
 
 
 

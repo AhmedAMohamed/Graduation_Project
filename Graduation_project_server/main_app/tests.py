@@ -20,7 +20,7 @@ class HomePageTest(TestCase):
 	def test_home_page_has_two_buttons(self):
 		request = HttpRequest()
 		response = home_page(request)
-		self.assertContains(response, '<button', count=2)
+		self.assertContains(response, '<a', count=2)
 
 class D3Page(TestCase):
 	def test_url_resolves_to_first_page(self):
