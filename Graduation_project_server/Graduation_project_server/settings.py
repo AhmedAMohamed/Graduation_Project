@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '3%9&et5r2!xrtcamsbso%!c2$(4ng-e-9mzo^o)l_gw_sf)j(='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -60,7 +60,7 @@ WSGI_APPLICATION = 'Graduation_project_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '../../database/db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
     }
 }
 
@@ -82,4 +82,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../../../static'))
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))

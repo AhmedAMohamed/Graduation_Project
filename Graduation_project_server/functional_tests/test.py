@@ -67,7 +67,7 @@ class HomePageTest(StaticLiveServerTestCase):
 		self.browser.set_window_size(1024, 768)
 
 		title = self.browser.find_element_by_tag_name('h1')
-		self.assertNotAlmostEqual(title.location['x'], 0, delta=15)
+		self.assertNotAlmostEqual(title.location['x'], 0, delta=10)
 		self.assertAlmostEqual(
 			title.location['x'] + title.size['width'] / 2,
 			512,
