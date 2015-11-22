@@ -33,9 +33,9 @@ class HomePageTest(StaticLiveServerTestCase):
 		self.assertEqual('Graduation project', self.browser.title,
 			'Wrong title: %s.' % self.browser.title)
 
-		#User sees 2 buttons
+		#User sees 3 buttons
 		buttons = self.browser.find_elements_by_tag_name('a')
-		self.assertEqual(len(buttons), 2, 'Missing buttons')
+		self.assertEqual(len(buttons), 3, 'Missing buttons')
 
 		#First button leads to a new page
 		first_button = buttons[0]
@@ -49,9 +49,9 @@ class HomePageTest(StaticLiveServerTestCase):
 		self.assertEqual(self.browser.current_url, home_page_url,
 			'Should be %s url instead %s' % (home_page_url, self.browser.current_url,))
 
-		#User still sees 2 buttons
+		#User still sees 3 buttons
 		buttons = self.browser.find_elements_by_tag_name('a')
-		self.assertEqual(len(buttons), 2, 'Missing buttons')
+		self.assertEqual(len(buttons), 3, 'Missing buttons')
 
 		#Second button leads to another page
 		second_button = buttons[1]
@@ -61,6 +61,24 @@ class HomePageTest(StaticLiveServerTestCase):
 			'second url is the same as the home')
 		self.assertNotEqual(first_button, second_button_url,
 			'second url is the same as the first button')
+
+		#User go back
+		self.browser.back()
+		self.assertEqual(self.browser.current_url, home_page_url,
+			'Should be %s url instead %s' % (home_page_url, self.browser.current_url,))
+
+		#User still sees 3 buttons
+		buttons = self.browser.find_elements_by_tag_name('a')
+		self.assertEqual(len(buttons), 3, 'Missing buttons found %d' % len(buttons))
+
+		#Third button leads to another page
+		second_button = buttons[2]
+		second_button.click()
+		second_button_url = self.browser.current_url
+		self.assertNotEqual(home_page_url, second_button_url,
+			'third url is the same as the home')
+		self.assertNotEqual(first_button, second_button_url,
+			'third url is the same as the first button')
 
 	def test_layout_is_loaded_correctly(self):
 		self.browser.get(self.server_url)

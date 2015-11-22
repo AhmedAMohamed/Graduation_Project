@@ -10,3 +10,6 @@ def d3_page(request):
 
 def visjs_page(request):
 	return render(request, 'Visjs.html')
+
+def mindmup(request):
+	return render(request, 'Mindmup.html')
