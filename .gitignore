@@ -1,4 +1,4 @@
-database/
-static/
-virtualenv/
+/database/
+/static/
+/virtualenv/
 *.pyc
