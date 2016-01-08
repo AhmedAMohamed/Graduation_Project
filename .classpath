@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/jcl-over-slf4j-1.7.13-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-api-1.7.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-ext-1.7.13-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-jcl-1.7.13-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-jdk14-1.7.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-migrator-1.7.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/slf4j-1.7.13/slf4j-nop-1.7.13-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/ejml-0.23.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/ejml-0.23-src.zip"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/javax.json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/javax.json-api-1.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/joda-time.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/joda-time-2.1-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/jollyday.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/jollyday-0.4.7-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/protobuf.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/stanford-corenlp-3.5.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/stanford-corenlp-3.5.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/stanford-corenlp-3.5.2-models.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/stanford-corenlp-3.5.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/xom.jar"/>
+	<classpathentry kind="lib" path="C:/Users/AhmedA/Desktop/stanford-corenlp-full-2015-04-20/xom-1.2.10-src.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
