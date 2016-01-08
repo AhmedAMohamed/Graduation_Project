@@ -1,6 +1,7 @@
 package grad.project;
 
 import java.util.List;
+import java.util.Scanner;
 
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.trees.Tree;
@@ -61,11 +62,16 @@ public class Node {
 	}
 
 	public String toString() {
-
 		return this.parseTreeNode.toString();
 	}
 
-	public static Node getNodebyWordIndex(Node rootNode, int wordIndex) { // done
+	public static Node getNodebyWordIndex(Node node, int wordIndex) { // done
+		if(node.wordIndex == wordIndex && node.parseTreeNode.isLeaf()) {
+			return node;
+		}
+		for(int i = 0; i < node.children.length; i++) {
+			return getNodebyWordIndex(node.children[i], wordIndex);
+		}
 		return null;
 	}
 
@@ -74,45 +80,42 @@ public class Node {
 		node.wordSense = def;
 	}
 
-	private static void printSEPT(Node node) {
-		System.out.println(node);
-		for (Node t : node.children) {
-			if (t.parseTreeNode.isLeaf()) {
-				System.out.println("This node is : \n\t in sentence "
-						+ t.sentIndex + " and its index is " + t.wordIndex);
-			} else {
-				printSEPT(t);
+	public static void printSEPT(Node node) {
+		if(node == null) {
+			
+		}
+		else {
+			for (Node t : node.children) {
+				if (t.parseTreeNode.isLeaf()) {
+					System.out.println("This node is : \n\t in sentence "
+							+ t.sentIndex + " and its index is " + t.wordIndex);
+				} else {
+					printSEPT(t);
+				}
 			}
 		}
 	}
 
 	public static void addCoref(List<Node> tree, List<CorefInputChain> corefs) {
-		for(CorefInputChain chain : corefs) {
-			Node sourceNode = findNode(chain.getSource(), tree);
-			for(CorefNode leaf : chain.getLeaves()) {
-				Node ref = findNode(leaf, tree);
+		Scanner s = new Scanner(System.in);
+		for (CorefInputChain chain : corefs) {
+			System.out.println(chain.getSource().getSentenceIndex() + "    " + chain.getSource().getWordIndex());
+			Node sourceNode = findCorefNode(chain.getSource(), tree);
+			System.out.println("the source node is in sentence " + sourceNode.sentIndex + " and the wordNum + " + sourceNode.wordIndex);
+			int ifgdf = s.nextInt();
+			for (CorefNode leaf : chain.getLeaves()) {
+				Node ref = findCorefNode(leaf, tree);
 				ref.coref = sourceNode;
 			}
 		}
 	}
 
-	private static Node findNode(CorefNode corefNode, List<Node> tree) {
-		for(Node root : tree) {
-			if(root.sentIndex == corefNode.getSentenceIndex()) {
+	private static Node findCorefNode(CorefNode corefNode, List<Node> tree) {
+		for (Node root : tree) {
+			if (root.sentIndex == corefNode.getSentenceIndex()) {
 				return Node.getNodebyWordIndex(root, corefNode.getWordIndex());
 			}
 		}
 		return null;
 	}
-
-	public static void main(String[] args) {
-
-		String sentence = "Khaled goes to college every Sunday in ASU";
-		Annotation anotate = API.annotate(sentence);
-		Tree t = API.getAllTrees(anotate).get(0);
-		List coref = API.getAllMentionsSets(anotate);
-		Node a = Node.sentenceBuilder(t, 1);
-		printSEPT(a);
-	}
-
 }
