@@ -1,0 +1,4 @@
+/database/
+/static/
+/virtualenv/
+*.pyc

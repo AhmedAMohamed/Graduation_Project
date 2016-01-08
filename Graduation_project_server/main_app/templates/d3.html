@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block body %}
+	<div id="canvas"></div>
+{% endblock %}
+
+{% block JS_INCLUDE %}
+ <script src="/static/d3/d3.v3.js"></script>
+ <link rel="stylesheet" type="text/css" href="/static/d3/d3cssfile.css">
+ <script>
+	  var w = 1000;
+	  var h = 2200;
+	  var tree = d3.layout.tree()
+	      .size([h, w - 50])
+	      .separation(function(a, b) { return (a.parent == b.parent ? 100 : 150) ; });
+
+	  var diagonal = d3.svg.diagonal()
+	      .projection(function(d) { return [d.y, d.x]; });
+
+	  var svg = d3.select("body").append("svg")
+	      .attr("width", w + 200)
+	      .attr("height", h + 1000)
+	      .append("g")
+	      .attr("transform", "translate(" + w/20 + "," + h/20+ ")");
+
+	  d3.json("/static/d3/gp.json", function(error, root) {
+	    if (error) throw error;
+
+	    var nodes = tree.nodes(root),
+	        links = tree.links(nodes);
+
+	    var scale  = d3.scale.quantize()
+	                  .domain([nodes[0].depth, nodes[nodes.length - 1].depth + 1])
+	                  .range([32, 16, 8, 4, 2]);
+
+	    var link = svg.selectAll(".link")
+	        .data(links)
+	        .enter()
+	        .append("path")
+	        .attr("class", "link")
+	        .attr("d", diagonal)
+	        .style("stroke-width", function(d){ return scale(d.source.depth);})
+	        .style("stroke-opacity", 0.5)
+	        .style("stroke", function(d){return "rgb(0, 0," +scale(d.source.depth) * 10+")"; });
+
+	    var node = svg.selectAll(".node")
+	        .data(nodes)
+	        .enter()
+	        .append("g")
+	        .attr("class", "node")
+	        .attr("transform", function(d) { return "translate(" + d.y +","+ d.x + ")"; });
+
+	      node.append("rect")
+	          .attr("width", 160)
+	          .attr("height", 19)  
+	          .attr("x", -8)     
+	          .attr("y", -11)
+	          .attr("rx", 6)
+	          .attr("ry", 6)
+	          .style("stroke", function(d){ return "black";})
+	          .style("fill", function(d){return "white";});
+
+	    node.append("text")
+	        .attr("x", function(d) {
+	          return d._children ? -8 : 8;
+	        })
+	        .attr("y", 3)
+	        .attr("dy", "0em")
+	        .style("font-size", 12)
+	        .text(function(d) {
+	          return d.name;
+	        });
+	        
+	    wrap(d3.selectAll('text'),150);
+	  });
+
+
+	  function wrap(text, width) {
+	    text.each(function() {
+	      var text = d3.select(this),
+	        words = text.text().split(/\s+/).reverse(),
+	        word,
+	        line = [],
+	        lineNumber = 0,
+	        lineHeight = 1.1, // ems
+	        y = text.attr("y"),
+	        dy = parseFloat(text.attr("dy")),
+	        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+	      while (word = words.pop()) {
+	        line.push(word);
+	        tspan.text(line.join(" "));
+	        if (tspan.node().getComputedTextLength() > width) {
+	          line.pop();
+	          tspan.text(line.join(" "));
+	          line = [word];
+	          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+	        }
+	      }
+	      d3.select(this.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
+	      
+	    });
+	}
+  </script>
+{% endblock %}
