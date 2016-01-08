@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.trees.Tree;
+import grad.project.CorefInputChain.CorefNode;
 
 public class Node {
 
@@ -11,7 +12,7 @@ public class Node {
 
 	int sentIndex;
 	int wordIndex;
-	Node ref;
+	Node coref;
 	String wordSense;
 	Node[] children;
 
@@ -25,6 +26,7 @@ public class Node {
 
 	/**
 	 * Trial
+	 * 
 	 * @param rootNode
 	 * @param index
 	 * @return
@@ -66,9 +68,9 @@ public class Node {
 	public static Node getNodebyWordIndex(Node rootNode, int wordIndex) { // done
 		return null;
 	}
-	
-	public static void addWsdToNode(Node rootNode,int wordIndex, String def) {
-		Node node = getNodebyWordIndex(rootNode,wordIndex);
+
+	public static void addWsdToNode(Node rootNode, int wordIndex, String def) {
+		Node node = getNodebyWordIndex(rootNode, wordIndex);
 		node.wordSense = def;
 	}
 
@@ -83,13 +85,28 @@ public class Node {
 			}
 		}
 	}
-	
-	public static void addCoref(Node rootNode, List coref) {
-		
+
+	public static void addCoref(List<Node> tree, List<CorefInputChain> corefs) {
+		for(CorefInputChain chain : corefs) {
+			Node sourceNode = findNode(chain.getSource(), tree);
+			for(CorefNode leaf : chain.getLeaves()) {
+				Node ref = findNode(leaf, tree);
+				ref.coref = sourceNode;
+			}
+		}
+	}
+
+	private static Node findNode(CorefNode corefNode, List<Node> tree) {
+		for(Node root : tree) {
+			if(root.sentIndex == corefNode.getSentenceIndex()) {
+				return Node.getNodebyWordIndex(root, corefNode.getWordIndex());
+			}
+		}
+		return null;
 	}
 
 	public static void main(String[] args) {
-		
+
 		String sentence = "Khaled goes to college every Sunday in ASU";
 		Annotation anotate = API.annotate(sentence);
 		Tree t = API.getAllTrees(anotate).get(0);
@@ -97,4 +114,5 @@ public class Node {
 		Node a = Node.sentenceBuilder(t, 1);
 		printSEPT(a);
 	}
+
 }

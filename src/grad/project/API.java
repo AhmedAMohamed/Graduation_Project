@@ -18,6 +18,8 @@ import java.util.*;
 
 public class API {
 
+	public static List<Node> tree;
+	
 	public static Annotation annotate(String Sentence) {
 		Properties props = new Properties();
 		props.put("annotators",
@@ -81,12 +83,23 @@ public class API {
 
 	public static void main(String[] args) {
 		Annotation a = API
-				.annotate("Khaled is good. He is great. He is awesome.");
-	//	System.out.println(API.getSentences(a));
-	//	System.out.println(API.getAllTrees(a));
-	//	System.out.println(API.getAllMentions(a));
+				.annotate("The term ontology has its origin in philosophy and has been applied in many different ways. The word element onto comes from the Greek, present participle of the verb . The core meaning within computer science is a model for describing the world that consists of a set of types, properties, and relationship types. There is also generally an expectation that the features of the model in an ontology should closely resemble the real world (related to the object)");
+		// System.out.println(API.getSentences(a));
+		List<Tree> trees = API.getAllTrees(a);
+		tree = new ArrayList<Node>();
+		for(Tree t : trees) {
+			tree.add(Node.sentenceBuilder(t, 1));
+		}
+		// System.out.println(API.getAllMentions(a));
 		List coref = API.getAllMentionsSets(a);
-		String corefList = coref.get(0).toString();
-		
+		List<CorefInputChain> corefs = new ArrayList<CorefInputChain>();
+		for (int i = 0; i < coref.size(); i++) {
+			String corefList = coref.get(i).toString();
+			corefList = corefList.substring(1, corefList.length() - 1);
+			System.out
+					.println("chain number : " + (i + 1) + " is " + corefList);
+			corefs.add(new CorefInputChain(corefList));
+		}
+		Node.addCoref(tree,corefs);
 	}
 }
