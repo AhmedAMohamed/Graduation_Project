@@ -1,121 +1,70 @@
 package grad.project;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Map;
 
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.trees.Tree;
-import grad.project.CorefInputChain.CorefNode;
+import java.io.*;
+import java.util.*;
+
+import edu.mit.jwi.item.Synset;
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
+import edu.stanford.nlp.io.*;
+import edu.stanford.nlp.ling.*;
+import edu.stanford.nlp.pipeline.*;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.trees.*;
+import edu.stanford.nlp.util.*;
+import edu.mit.jwi.*;
 
 public class Node {
 
-	Tree parseTreeNode; // this is the parse tree node
+    Tree parseTreeNode; // this is the parse tree node
 
-	int sentIndex;
-	int wordIndex;
-	Node coref;
-	String wordSense;
-	Node[] children;
+    int sentIndex;
+    int wordIndex;
+    Node ref;
+    String wordSense;
 
-	private static int globalWordIndex = 1;
+    Node[] children;
 
-	Node(Tree node, int sentIndex) {
-		parseTreeNode = node;
-		this.sentIndex = sentIndex;
-		children = new Node[parseTreeNode.children().length];
-	}
+    private static int globalWordIndex = 1;
 
-	/**
-	 * Trial
-	 * 
-	 * @param rootNode
-	 * @param index
-	 * @return
-	 */
-	public static Node sentenceBuilder(Tree rootNode, int index) { // returns
-																	// the head
-																	// node,
-																	// index is
-																	// the
-																	// sentence
-																	// index
-		Node node = new Node(rootNode, index);
-		treeBuilder(node, index);
-		globalWordIndex = 3;
-		return node;
-	}
+    Node(Tree node, int sentIndex) {
+        parseTreeNode = node;
+        this.sentIndex = sentIndex;
+        this.wordIndex = -1;
+        children = new Node[parseTreeNode.children().length];
+    }
 
-	/**
-	 * 
-	 * @param node
-	 * @param index
-	 */
-	private static void treeBuilder(Node node, int index) {
-		for (int i = 0; i < node.children.length; i++) {
-			node.children[i] = new Node(node.parseTreeNode.children()[i], index);
-			if (node.children[i].parseTreeNode.isLeaf()) {
-				node.children[i].wordIndex = globalWordIndex++;
-			} else {
-				treeBuilder(node.children[i], index);
-			}
-		}
-	}
 
-	public String toString() {
-		return this.parseTreeNode.toString();
-	}
+    public String toString() {
 
-	public static Node getNodebyWordIndex(Node node, int wordIndex) { // done
-		if(node.wordIndex == wordIndex && node.parseTreeNode.isLeaf()) {
-			return node;
-		}
-		for(int i = 0; i < node.children.length; i++) {
-			return getNodebyWordIndex(node.children[i], wordIndex);
-		}
-		return null;
-	}
+        return this.parseTreeNode.toString();
+    }
 
-	public static void addWsdToNode(Node rootNode, int wordIndex, String def) {
-		Node node = getNodebyWordIndex(rootNode, wordIndex);
-		node.wordSense = def;
-	}
 
-	public static void printSEPT(Node node) {
-		if(node == null) {
-			
-		}
-		else {
-			for (Node t : node.children) {
-				if (t.parseTreeNode.isLeaf()) {
-					System.out.println("This node is : \n\t in sentence "
-							+ t.sentIndex + " and its index is " + t.wordIndex);
-				} else {
-					printSEPT(t);
-				}
-			}
-		}
-	}
 
-	public static void addCoref(List<Node> tree, List<CorefInputChain> corefs) {
-		Scanner s = new Scanner(System.in);
-		for (CorefInputChain chain : corefs) {
-			System.out.println(chain.getSource().getSentenceIndex() + "    " + chain.getSource().getWordIndex());
-			Node sourceNode = findCorefNode(chain.getSource(), tree);
-			System.out.println("the source node is in sentence " + sourceNode.sentIndex + " and the wordNum + " + sourceNode.wordIndex);
-			int ifgdf = s.nextInt();
-			for (CorefNode leaf : chain.getLeaves()) {
-				Node ref = findCorefNode(leaf, tree);
-				ref.coref = sourceNode;
-			}
-		}
-	}
+    public static void main(String[] args) {
+        String sentence = "Khaled goes to college every Sunday in ASU. Ahmed is good he is student";
 
-	private static Node findCorefNode(CorefNode corefNode, List<Node> tree) {
-		for (Node root : tree) {
-			if (root.sentIndex == corefNode.getSentenceIndex()) {
-				return Node.getNodebyWordIndex(root, corefNode.getWordIndex());
-			}
-		}
-		return null;
-	}
+        List<Tree> trees = API.getAllTrees(API.annotate(sentence));
+        int index = 1;
+        for(Tree tree : trees) {
+            Node a = SEPTBuilder.sentenceBuilder(tree, index++);
+            SEPTBuilder.printSEPT(a);
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+            Node current = SEPTBuilder.getNodeByWordIndex(a, 2);
+            System.out.println("current node index is " + current.wordIndex + "   " + current.parseTreeNode);
+            Scanner s = new Scanner(System.in);
+            int ty = s.nextInt();
+
+        }
+
+
+    }
 }
