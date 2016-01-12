@@ -1,19 +1,19 @@
 package grad.project;
 
-import java.io.*;
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations;
+import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.IntPair;
+import grad.project.CorefInputChain.CorefNode;
+
 import java.util.*;
 
 //import edu.mit.jwi.item.Synset;
-import edu.stanford.nlp.dcoref.CorefChain;
-import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
-import edu.stanford.nlp.io.*;
-import edu.stanford.nlp.ling.*;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
-import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.*;
-import grad.project.CorefInputChain.CorefNode;
 
 //import edu.mit.jwi.*;
 
@@ -74,7 +74,7 @@ public class API {
 
 	public static void main(String[] args) {
 		Annotation a = API
-				.annotate("Khaled is good. He is great. He is awesome.");
+				.annotate("Khaled is good. He is great. He is awesome and pre-processing");
 		
 		List<Tree> trees = API.getAllTrees(a);
 		List list = API.getAllMentionsSets(a);
