@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="edu.mit.jwi_2.4">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Documents/jwi/edu.mit.jwi_2.4.0_all" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/Documents/jwi/edu.mit.jwi_2.4.0_all" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/Documents/jwi/edu.mit.jwi_2.4.0_all" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/Documents/jwi/edu.mit.jwi_2.4.0_all" recursive="false" type="SOURCES" />
+  </library>
+</component>
