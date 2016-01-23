@@ -2,3 +2,8 @@
 /static/
 /virtualenv/
 *.pyc
+*.class
+/bin/
+.classpath
+*.xml
+*.iml
