@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="row">
+		<div class="medium-8 small-12 small-centered columns text-center">
+			<form method="GET" action='/query/'>
+				<input type="text" name="query" id="query">
+			</form>
+			{% if json %}
+				<div id="json">{{ json }}</div>
+			{% endif %}
+		</div>
+</div>
+
+{% endblock %}

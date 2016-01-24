@@ -13,3 +13,7 @@ def visjs_page(request):
 
 def mindmup(request):
 	return render(request, 'Mindmup.html')
+
+def query_page(request):
+	param = request.GET.get('query', None)
+	return render(request, 'query.html', {'json': param})

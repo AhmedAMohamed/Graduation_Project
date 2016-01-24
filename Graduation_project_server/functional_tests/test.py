@@ -92,5 +92,16 @@ class HomePageTest(StaticLiveServerTestCase):
 			delta=5
 		)
 
+	def test_server_respond_to_query(self):
+		self.browser.get(self.server_url + '/query')
+		input_box = self.browser.find_element_by_id('query')
+
+		# Enter a query
+		input_box.send_keys('Ahmed is late')
+		input_box.send_keys(Keys.ENTER)
+
+		json = self.browser.find_element_by_id('json').text
+		self.assertNotEqual(json, '')
+
 
 
