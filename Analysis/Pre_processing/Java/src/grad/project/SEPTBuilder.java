@@ -57,6 +57,14 @@ public class SEPTBuilder {
 		}
 	}
 
+	public static String SEPTString(Node node) {
+		for (Node t : node.children) {
+			return node + "\n" + SEPTString(t);
+		}
+		return "";
+	}
+
+
 	/**
 	 * 
 	 * @param node root node of the sentence
