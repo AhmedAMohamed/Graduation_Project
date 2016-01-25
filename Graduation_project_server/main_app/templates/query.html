@@ -7,9 +7,26 @@
 				<input type="text" name="query" id="query">
 			</form>
 			{% if json %}
-				<div id="json">{{ json }}</div>
+				<div id="json" style="visibility: hidden">{{ json }}</div>
+				<div id="mynetwork"></div>
 			{% endif %}
 		</div>
 </div>
 
+{% endblock %}
+
+{% block JS_INCLUDE %}
+<style type="text/css">
+    body {
+      font: 10pt sans;
+    }
+    #mynetwork {
+      width: 500px;
+      height: 500px;
+    }
+  </style>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+  <script type="text/javascript" src="/static/parsetree/vis_js_hierarchical_layout.js"></script>
 {% endblock %}
