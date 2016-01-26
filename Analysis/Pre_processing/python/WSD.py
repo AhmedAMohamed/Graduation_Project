@@ -80,6 +80,3 @@ def getSense(text):
 
 
     return json.dumps(dict)
-
-#getSense(text2)
-

@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.test import TestCase
 from django.http import HttpRequest
 
-from main_app.views import home_page, d3_page, visjs_page, mindmup
+from main_app.views import home_page, d3_page, visjs_page, mindmup, query_page
 
 # Create your tests here.
 class HomePageTest(TestCase):
@@ -53,4 +53,24 @@ class Mindmup(TestCase):
 		request = HttpRequest()
 		response = mindmup(request)
 		expected_html = render_to_string('Mindmup.html')
-		self.assertEqual(response.content.decode(), expected_html) 
+		self.assertEqual(response.content.decode(), expected_html)
+
+class QueryPageTests(TestCase):
+	def test_url_resolves_to_query_page(self):
+		found = resolve('/query/')
+		self.assertEqual(found.func, query_page)
+
+	def test_query_page_returns_correct_html_with_text_field(self):
+		request = HttpRequest()
+		response = query_page(request)
+		expected_html = render_to_string('query.html')
+		self.assertEqual(response.content.decode(), expected_html)
+
+	def test_query_page_get_queries(self):
+		response = self.client.get(
+				'/query/',
+				data = {
+					'query': 'ahmed'
+				}
+			)
+		self.assertContains(response, 'ahmed')
