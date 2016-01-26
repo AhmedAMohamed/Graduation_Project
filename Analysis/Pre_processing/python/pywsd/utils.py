@@ -92,10 +92,14 @@ def lemmatize(ambiguous_word, pos=None, neverstem=False,
 def penn2morphy(penntag, returnNone=False):
     morphy_tag = {'NN':wn.NOUN, 'JJ':wn.ADJ,
                   'VB':wn.VERB, 'RB':wn.ADV}
+
     try:
+
         return morphy_tag[penntag[:2]]
+
     except:
         return None if returnNone else ''
+
 
 def lemmatize_sentence(sentence, neverstem=False, keepWordPOS=False, 
                        tokenizer=word_tokenize, postagger=pos_tag, 
@@ -118,6 +122,7 @@ def synset_properties(synset, parameter):
     """
     return_type = SS_PARAMETERS_TYPE_MAP[parameter]
     func = 'synset.' + parameter
+
     return eval(func) if isinstance(eval(func), return_type) else eval(func)()
 
 def has_synset(word):

@@ -47,6 +47,7 @@ def compare_overlaps(context, synsets_signatures, \
     for ss in synsets_signatures:
         overlaps = set(synsets_signatures[ss]).intersection(context)
         overlaplen_synsets.append((len(overlaps), ss))
+
     
     # Rank synsets from highest to lowest overlap.
     ranked_synsets = sorted(overlaplen_synsets, reverse=True)
@@ -90,19 +91,34 @@ def simple_signature(ambiguous_word, pos=None, lemma=True, stem=False, \
     (iii) hypernyms and hyponyms
     """
     synsets_signatures = {}
+    sign =[]
+    hypsign=[]
     for ss in wn.synsets(ambiguous_word):
+        #Doha 25/1 the satellite ADJ in wordnet is mapped to wordnet adjective
+        synsetPOS=str(ss.pos())
+        if synsetPOS=='s':
+            synsetPOS='a'
+        #DohA 25/1 cHANGED ss.pos() with synsetPOS
         try: # If POS is specified.
-            if pos and str(ss.pos()) != pos:
+            if pos and synsetPOS != pos:
+
                 continue
         except:
             if pos and str(ss.pos) != pos:
+
                 continue
+        #Doha 26/1
+
         signature = []
         # Includes definition.
         ss_definition = synset_properties(ss, 'definition')
+
         signature+=ss_definition
+
+
         # Includes examples
         ss_examples = synset_properties(ss, 'examples')
+
         signature+=list(chain(*[i.split() for i in ss_examples]))
         # Includes lemma_names.
         ss_lemma_names = synset_properties(ss, 'lemma_names')
@@ -113,8 +129,10 @@ def simple_signature(ambiguous_word, pos=None, lemma=True, stem=False, \
             ss_hyponyms = synset_properties(ss, 'hyponyms')
             ss_hypernyms = synset_properties(ss, 'hypernyms')
             ss_hypohypernyms = ss_hypernyms+ss_hyponyms
-            signature+= list(chain(*[i.lemma_names() for i in ss_hypohypernyms]))
-        
+
+            signature+=( list(chain(*[i.lemma_names() for i in ss_hypohypernyms])))
+
+
         # Optional: removes stopwords.
         if stop == True: 
             signature = [i for i in signature if i not in EN_STOPWORDS]
@@ -171,42 +189,50 @@ def adapted_lesk(context_sentence, ambiguous_word, \
     if not wn.synsets(ambiguous_word):
         return None
     # Get the signatures for each synset.
+
     ss_sign = simple_signature(ambiguous_word, pos, lemma, stem, hyperhypo)
-    for ss in ss_sign:
+#Doha :For handling empty ss_sign
+    if not ss_sign:
+        best_sense=None
+
+    else:
+        for ss in ss_sign:
         # Includes holonyms.
-        ss_mem_holonyms = synset_properties(ss, 'member_holonyms')
-        ss_part_holonyms = synset_properties(ss, 'part_holonyms')
-        ss_sub_holonyms = synset_properties(ss, 'substance_holonyms')
+            ss_mem_holonyms = synset_properties(ss, 'member_holonyms')
+            ss_part_holonyms = synset_properties(ss, 'part_holonyms')
+            ss_sub_holonyms = synset_properties(ss, 'substance_holonyms')
         # Includes meronyms.
-        ss_mem_meronyms = synset_properties(ss, 'member_meronyms')
-        ss_part_meronyms = synset_properties(ss, 'part_meronyms')
-        ss_sub_meronyms = synset_properties(ss, 'substance_meronyms')
+            ss_mem_meronyms = synset_properties(ss, 'member_meronyms')
+            ss_part_meronyms = synset_properties(ss, 'part_meronyms')
+            ss_sub_meronyms = synset_properties(ss, 'substance_meronyms')
         # Includes similar_tos
-        ss_simto = synset_properties(ss, 'similar_tos')
+            ss_simto = synset_properties(ss, 'similar_tos')
         
-        related_senses = list(set(ss_mem_holonyms+ss_part_holonyms+ 
+            related_senses = list(set(ss_mem_holonyms+ss_part_holonyms+
                                   ss_sub_holonyms+ss_mem_meronyms+ 
                                   ss_part_meronyms+ss_sub_meronyms+ ss_simto))
     
-        signature = list([j for j in chain(*[synset_properties(i, 'lemma_names') 
+            signature = list([j for j in chain(*[synset_properties(i, 'lemma_names')
                                              for i in related_senses]) 
                           if j not in EN_STOPWORDS])
-        
+
+
     # Lemmatized context is preferred over stemmed context
-    if lemma == True:
-        signature = [lemmatize(i) for i in signature]
+        if lemma == True:
+            signature = [lemmatize(i) for i in signature]
     # Matching exact words causes sparsity, so optional matching for stems.
-    if stem == True:
-        signature = [porter.stem(i) for i in signature]
+        if stem == True:
+            signature = [porter.stem(i) for i in signature]
     # Adds the extended signature to the simple signatures.
-    ss_sign[ss]+=signature
-  
+        ss_sign[ss]+=signature
+
     # Disambiguate the sense in context.
-    if context_is_lemmatized:
-        context_sentence = context_sentence.split()
-    else:
-        context_sentence = lemmatize_sentence(context_sentence)
-    best_sense = compare_overlaps(context_sentence, ss_sign, \
+        if context_is_lemmatized:
+            context_sentence = context_sentence.split()
+        else:
+            context_sentence = lemmatize_sentence(context_sentence)
+
+        best_sense = compare_overlaps(context_sentence, ss_sign, \
                                     nbest=nbest, keepscore=keepscore, \
                                     normalizescore=normalizescore)
     return best_sense
