@@ -31,10 +31,12 @@ def getSense(text):
 
     dict = {}
 
+
     sent_index = 0
-    word_index = 1
+
 
     for sent in sents:
+
 
         sent_index+=1
 
@@ -44,14 +46,15 @@ def getSense(text):
         words=word_tokenize(sent)
 
         tagged_words=pos_tag(words)
-
+        word_index=0
         for word in tagged_words:
-            print word
+
+            word_index += 1
 
             pos = ut.penn2morphy(word[1])
 
-            index=str(word)+" "+str(word_index)+" "+str(sent_index)
-
+            index=str(word_index)+" "+str(sent_index)
+           # print str(word)+" "+str(index)
 
 
             if(pos!=''):
@@ -76,7 +79,7 @@ def getSense(text):
             else: dict[index]="None"
 
 
-            word_index+=1
+
 
 
     return json.dumps(dict)
