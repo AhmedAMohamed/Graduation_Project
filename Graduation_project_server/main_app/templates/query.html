@@ -1,30 +1,23 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="row">
-		<div class="medium-8 small-12 small-centered columns text-center">
-			<form method="GET" action='/query/'>
-				<input type="text" name="query" id="query">
-			</form>
-			{% if json %}
-				<div id="json" style="visibility: hidden">{{ json }}</div>
-				<div id="mynetwork"></div>
-			{% endif %}
-		</div>
-</div>
-
+	<div class="navigationbar">
+		<div id="appname">Symapse</div>
+	</div>
+	<div class = "query_box">
+		<form method="get" action="/query/">
+		<label for="query_textbox" id = "query_label">Type your query here!</label>
+			<input class="form-control" id="query_textbox" placeholder="Enter a query" name="query">
+		</form>
+	</div>
+	{% if json %}
+		<div id="json" style="visibility: hidden"> {{ json }}</div>
+		<div id="mynetwork">
+	{% endif %}
+	</div>
 {% endblock %}
 
 {% block JS_INCLUDE %}
-<style type="text/css">
-    body {
-      font: 10pt sans;
-    }
-    #mynetwork {
-      width: 500px;
-      height: 500px;
-    }
-  </style>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.css" rel="stylesheet" type="text/css" />
 

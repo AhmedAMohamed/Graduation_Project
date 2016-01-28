@@ -1,0 +1,124 @@
+@font-face{
+    font-family: Fake Reciept;
+    src:url(fonts/appnamefont.ttf);
+    font-size:large;
+}
+
+@font-face{
+    font-family: Aller;
+    src:url(fonts/Aller_Lt.ttf);
+    font-size:large;
+}
+*{
+    font-family: Aller;
+    font-size: 18px;
+}
+body { 
+	margin: 0; 
+	padding: 0;
+	background-color: #F1EDE1;
+}
+.querypage_body{
+	background-color: #F1EDE1;
+}
+.d3page_body{
+
+}
+.query_box{
+	width: 500px;
+	height: 50px;
+	margin: auto;
+	margin-top: 2em;
+	margin-bottom: 3em;
+}
+#query_label{
+	color: #121936;
+}
+#mynetwork {
+      width: 1350px;
+      height: 550px;
+ }
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+#forcelayout{
+	background-color: #F1EDE1;
+	z-index: -120;
+	/*opacity:0.5;*/
+
+}
+.navigationbar{
+	width: auto;
+	height: auto;
+	background-color: #121936;
+}
+
+#appname{
+	font-family: Fake Reciept;
+	font-size: 75px;
+    color: #F1EDE1;
+	padding: 30px 0px 40px 40px;
+	z-index: 2;
+}
+
+a.btn{
+	margin-top: 5em;
+    height: 70px;
+	width: 250px;
+    display: block;
+    position: absolute;
+    border-radius: 6px;    
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #8B2055;
+    border: 2px solid #8B2055;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.5);
+
+}
+
+a.btn_parsetree{
+	left: 330px;
+	background-color: #F85A26;
+	border: 1px solid #fff;
+	color: #fff;
+
+}
+
+a.btn_mindmupmap{
+	left: 50px;
+	top: 350px;
+}
+
+a.btn_d3map{
+	left: 330px;
+	top: 350px;
+}
+
+a.btn_visjsmap{
+	left: 610px;
+	top: 350px;
+}
+a.btn:hover { 
+	cursor: pointer;
+	background-color: #8B2055;
+	color: #fff;
+	border: 3px solid transparent;
+
+}
+a.btn_parsetree:hover{
+	background-color: transparent;
+	color: #F85A26;
+	border: 3px solid #F85A26;
+}
+
+
+
