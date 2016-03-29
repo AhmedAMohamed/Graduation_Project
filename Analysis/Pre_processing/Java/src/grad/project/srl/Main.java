@@ -3,6 +3,7 @@ package grad.project.srl;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 class Word {
     int position;
@@ -99,6 +100,10 @@ public class Main {
         }
 
         frames.forEach(System.out::println);
+
+        for(Frame f : frames) {
+            System.out.println(f.findArgumentByType("A0"));
+        }
     }
 }
 
@@ -109,7 +114,7 @@ class Frame {
     int wordNumber;
     String partOfSpeech;
     String word;
-    ArrayList<Argument> arguments;
+    HashMap<String, ArrayList<Argument>> arguments;
     int index;
 
     Frame(String pred, int sentenceNumber, int wordNumber, String partOfSpeech, String word, int index) {
@@ -118,7 +123,7 @@ class Frame {
         this.wordNumber = wordNumber;
         this.partOfSpeech = partOfSpeech;
         this.word = word;
-        this.arguments = new ArrayList<>();
+        this.arguments = new HashMap<>();
         this.index = index;
     }
 
@@ -126,19 +131,19 @@ class Frame {
         Argument a = (Argument) arg.clone();
         a.argumentTypes = new String[] {arg.argumentTypes[index]};
         a.argumentType = arg.argumentTypes[index];
-        arguments.add(a);
+        ArrayList<Argument> list = new ArrayList<>();
+        list.add(a);
+        arguments.put(a.argumentType, list);
     }
 
     public Argument findArgumentByType(String type) {
-        for (Argument arg : arguments)
-            if (arg.argumentType.equals(type)) return arg;
-        return null;
+        return arguments.get(type).get(0);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
-        for (Argument i : arguments) sb.append(i + ", ");
+        for (ArrayList<Argument> i : arguments.values()) sb.append(i.get(0) + ", ");
         sb.append("]");
         return String.format(
                 "[FRAME]: Word: [%s]\nPart of Speech: [%s]\nPred: [%s]\n" +
