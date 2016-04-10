@@ -104,7 +104,7 @@
    				path.exit().remove();//not understandable
 
    			  var node = svg.selectAll("g.node")
-      						.data(nodes);
+     				 .data(nodes, function(d) { return d.id || (d.id = ++i); });
  
  
 				  // Enter any new nodes.
@@ -132,16 +132,18 @@
 			          .attr("y", -10)
 			          .attr("dy", "0em")
 			          .attr("text-anchor", "middle")
-			          .style("font-size", 12)
-			          .text(function(d) {
+			          .style("font-size", 12);
+			    nodeEnter.selectAll("text").text(function(d) {
 			        //  	str = JSON.stringify(d, null, 4);
 				    //console.log("d: "+ str);
 
-				    //console.log("append text: "+ d.name);
+				    console.log("append text: "+ d.name);
 			            return d.name;
 			          });
 			          
-			    wrap(d3.selectAll('text'), 25);
+			    var textToWrap = d3.selectAll('text');
+			    console.log(textToWrap);
+			    wrap(textToWrap, 25);
 
 		        node.exit().remove();
 				path = svg.selectAll("path.link");
@@ -189,7 +191,7 @@
 			        }
 			        d3.select(this.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
 			        
-      });
+      		});
   }
 
 			function nodeTransform(d) {
@@ -219,7 +221,7 @@
 				    dFromElement.children = dFromElement._children;
 				    dFromElement._children = null;
 				  }
-				  console.log('root: ' + JSON.stringify(root, null, 4));
+				  //console.log('root: ' + JSON.stringify(root, null, 4));
 				 
 				  update();
 
@@ -240,19 +242,6 @@
 				  recurse(root);
 				  return nodes;
 			}
-
-			// Wrap text in a circle, and size the text to fit.
-		  /*d3plus.textwrap()
-		    .container(d3.select("text#circleResize"))
-		    .resize(true)
-		    .draw();*/
-
-		/*console.log(d3.select(this).text);
-		d3.selectAll("text").each(function (d, i) {
-            d3plus.textwrap()
-                    .container(d3.select(this))
-                    .draw();
-        });*/
 		
 		</script>
 	</body>
