@@ -14,6 +14,8 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.IntPair;
 import grad.project.CorefInputChain.CorefNode;
 import com.rabbitmq.client.AMQP.BasicProperties;
+import grad.project.srl.DMRGraph;
+import grad.project.srl.Main;
 
 import java.util.*;
 
@@ -154,6 +156,8 @@ public class API {
             break;
         }
         SEPTBuilder.SEPTs = new ArrayList<Node>();
+        DMRGraph result = Main.generateTree();
+
         return response;
     }
 }
