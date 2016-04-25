@@ -1,3 +1,8 @@
+package grad.project.srl;
+
+import grad.project.ArgumentBuilder;
+import grad.project.FrameBuilder;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,32 +12,25 @@ import java.util.Map.Entry;
 
 public class DMRGraph {
 	private Map<String, Integer> scoreRoot;
-	private Map<String, Argument> ArgsHash;
-	private ArrayList<Frame> ActionFrames;
+	public Map<String, ArgumentBuilder> ArgsHash;
+	public ArrayList<FrameBuilder> ActionFrames;
 
-	DMRGraph(ArrayList<Frame> frames) {
-		ArgsHash = new HashMap<String, Argument>();
+	DMRGraph(ArrayList<FrameBuilder> frames) {
+		ArgsHash = new HashMap<String, ArgumentBuilder>();
 		ActionFrames = frames;
-
 	}
 
 	public ArrayList<String> createGraph() {
 
-		Iterator<Frame> ActionFramesIterator = ActionFrames.iterator();
+		Iterator<FrameBuilder> ActionFramesIterator = ActionFrames.iterator();
 		while (ActionFramesIterator.hasNext()) {
 			// Iterate over all the pairs in the hashmap of ActionArgs
-			Frame ActionFrame = ActionFramesIterator.next();
-			for (Map.Entry<String, ArrayList<Argument>> ArgPair : ActionFrame.arguments.entrySet()) {
-				ArrayList<Argument> FrameArguments = ArgPair.getValue();
+			FrameBuilder ActionFrame = ActionFramesIterator.next();
+			for (Map.Entry<String, ArrayList<ArgumentBuilder>> ArgPair : ActionFrame.arguments.entrySet()) {
+				ArrayList<ArgumentBuilder> FrameArguments = ArgPair.getValue();
 
-				for (Argument Arg : FrameArguments) {
+				for (ArgumentBuilder Arg : FrameArguments) {
 					String Word;
-					// Check if the Argument has a coref
-					/*
-					 * if(Arg.Coref!=null){ Word=Arg.Coref; } else {
-					 * 
-					 * Word=Arg.word; }
-					 */
 					Word = Arg.word;
 
 					if (ArgsHash.get(Word) != null) {
@@ -55,8 +53,6 @@ public class DMRGraph {
 				
 			}
 		}
-		
-
 		ArrayList<String> root = new ArrayList<String>();
 		int maxScore = Collections.max(scoreRoot.values());
 		Iterator<Entry<String, Integer>> rootIterator = scoreRoot.entrySet().iterator();
@@ -67,7 +63,5 @@ public class DMRGraph {
 			}
 		}
 		return root;
-		
 	}
-
 }
