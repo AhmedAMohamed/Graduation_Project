@@ -1,0 +1,190 @@
+
+{  
+    "name":"GP",
+    "root1":true,
+    "children":[  
+        {  
+            "name":"Product Backlog",
+            "children":[  
+                {  
+                    "name":"As a user,",
+                    "children":[  
+                        {  
+                            "name":"I want to explore the articles",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"Wikipedia article",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"pdf book file",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"information being represented",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"enjoyable dynamic way",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"provide the link of a book",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"export the visualization",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"enter the URL of any webpage",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"a label to the topic",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"As a development team,",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"As a system,",
+                    "children":[  
+                        {  
+                            "name":"unique extension",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"more accustomed to the topic",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"explore the content and generate subtopics",
+                            "children":[  
+                                {  
+                                    "name":"Understand the text",
+                                    "children":[  
+
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {  
+            "name":"App General Specifications",
+            "children":[  
+                {  
+                    "name":"web-based",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"reponsive",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"mobile version: Android and iOS",
+                    "children":[  
+
+                    ]
+                }
+            ]
+        },
+        {  
+            "name":"Team Requirements",
+            "children":[  
+                {  
+                    "name":"Analysis team",
+                    "children":[  
+                        {  
+                            "name":"NLP",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"fundamentals of visualization",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"Visualization Team",
+                    "children":[  
+                        {  
+                            "name":"JavaScript libraries",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"learn JS",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"fundamentals of analysis",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"HCI, UX",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"Development Team",
+                    "children":[  
+                        {  
+                            "name":"learn python basics",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

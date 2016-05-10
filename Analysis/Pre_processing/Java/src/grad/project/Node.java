@@ -6,12 +6,12 @@ import java.util.List;
 
 public class Node {
 
-	Tree parseTreeNode; // this is the parse tree node
+	public Tree parseTreeNode; // this is the parse tree node
 
 	int sentIndex;
 	int wordIndex;
-	Node ref;
-	String wordSense;
+	public Node ref;
+	public String wordSense;
 
 	Node[] children;
 

@@ -21,19 +21,7 @@ import nltk
 
 
 
-#wordnet_pos_ta
-def wordnet_pos_code(tag):
-    if tag.startswith('N'):
-        return 'n'
-    elif tag.startswith('V'):
-        return 'v'
 
-    #elif tag.startswith('J'):
-    #    return 'adj'
-    #elif tag.startswith('RB'):
-        #return 'adv'
-    else:
-        return 'none'
 
 def getSense(text):
     print(text)
@@ -43,64 +31,55 @@ def getSense(text):
 
     dict = {}
 
+
     sent_index = 0
-    word_index = 1
+
 
     for sent in sents:
-        print sent
-        print "Sent index is "
+
+
         sent_index+=1
-        print(sent_index)
+
         sent = sent.translate(None, string.punctuation)
 
 
         words=word_tokenize(sent)
 
         tagged_words=pos_tag(words)
-
+        word_index=0
         for word in tagged_words:
 
+            word_index += 1
+
             pos = ut.penn2morphy(word[1])
-            index=str(word)+" "+str(word_index)+" "+str(sent_index)
+
+            index=str(word_index)+" "+str(sent_index)
+           # print str(word)+" "+str(index)
 
 
-
-            if(pos!="none"):
+            if(pos!=''):
 
 
                 WW=adapted_lesk(sent,word[0],pos)
 
 
+
                 if(WW.__class__ == nltk.corpus.reader.wordnet.Synset):
 
 
-                    #Doha
-                    print word[0]
+
                     dict[index]=WW.definition()
-                    print "definition"
-                    print dict[index]
+
 
 
                 else:
 
                     dict[index]="None"
-                    print "None"
-                    print word[0]
+
+            else: dict[index]="None"
 
 
 
-                word_index+=1
-            '''
-            else:
-                 WW2=adapted_lesk(sent,word[0])
-                 print (WW2.__class__ + "      word sense class")
-                 if(WW2.__class__ != None):
-                    dict[index] = WW2.definition()
-                 else:
-                    dict[index]="None"
-                 word_index+=1
-                 print dict[index],word[0]
 
-            '''
 
     return json.dumps(dict)

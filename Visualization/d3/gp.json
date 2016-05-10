@@ -1,0 +1,207 @@
+
+{  
+    "name":"GP",
+    "children":[  
+        {  
+            "name":"Product Backlog",
+            "children":[  
+                {  
+                    "name":"As a user,",
+                    "children":[  
+                        {  
+                            "name":"I want to explore the articles, blogs, and text  in a mind map",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want when I provide the  app with Wikipedia article the mind map becomes generated (search on wikipedia by words) ",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to upload a pdf book file so that I get the result visualization summary",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want the information being represented to be as inferred from the article/text",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want the information being represented to be not more than 5 lines",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want the mind map to be represented in an enjoyable dynamic way (interact with the visualization and drag the nodes so that I can personalize my own image visualization)",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want when I provide the app with the link of a book/upload a book the mindmap becomes generated",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to create an account so that I can keep track of my previous visualizations",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to export the visualization so that I can save it for personal usages",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to enter the URL of any webpage so that I can get the visualization summary future work",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to see a label to the topic future work",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"As a development team,",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"As a system,",
+                    "children":[  
+                        {  
+                            "name":"I want to create a unique extension so that the user can export and later import that visualization",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to check if the search keyword results in many wikipedia pages, so that the user chooses which one to visualize",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want the visualization of the article to be more accustomed with respect to the topic",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"I want to explore the content and generate subtopics",
+                            "children":[  
+                                {  
+                                    "name":"Understand the text and get out subtopics that may not be explicitly found inside the text ",
+                                    "children":[  
+
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {  
+            "name":"App General Specifications",
+            "children":[  
+                {  
+                    "name":"web-based",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"reponsive",
+                    "children":[  
+
+                    ]
+                },
+                {  
+                    "name":"mobile version: Android and iOS",
+                    "children":[  
+
+                    ]
+                }
+            ]
+        },
+        {  
+            "name":"Team Requirements",
+            "children":[  
+                {  
+                    "name":"Analysis team",
+                    "children":[  
+                        {  
+                            "name":"have good background in a programming language with a fast data mining capability",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"know the fundamentals of how the visualization will be done",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"Visualization Team",
+                    "children":[  
+                        {  
+                            "name":"research various JavaScript libraries and make a selection",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"have a good background in JS and at least one visualization library (learn JS)",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"know the fundamentals of how the analysis will be done",
+                            "children":[  
+
+                            ]
+                        },
+                        {  
+                            "name":"Fields like HCI should be taken in consideration. Use user experience evaluation to evaluate the frontend of the app.",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                },
+                {  
+                    "name":"Development Team",
+                    "children":[  
+                        {  
+                            "name":"learn python basics",
+                            "children":[  
+
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
