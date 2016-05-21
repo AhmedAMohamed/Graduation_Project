@@ -11,57 +11,37 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class DMRGraph {
-	private Map<String, Integer> scoreRoot;
+
 	public Map<String, ArgumentBuilder> ArgsHash;
 	public ArrayList<FrameBuilder> ActionFrames;
 
 	DMRGraph(ArrayList<FrameBuilder> frames) {
-		ArgsHash = new HashMap<String, ArgumentBuilder>();
+		ArgsHash = new HashMap();
 		ActionFrames = frames;
 	}
 
-	public ArrayList<String> createGraph() {
+	public void createGraph() {
 
 		Iterator<FrameBuilder> ActionFramesIterator = ActionFrames.iterator();
 		while (ActionFramesIterator.hasNext()) {
 			// Iterate over all the pairs in the hashmap of ActionArgs
-			FrameBuilder ActionFrame = ActionFramesIterator.next();
-			for (Map.Entry<String, ArrayList<ArgumentBuilder>> ArgPair : ActionFrame.arguments.entrySet()) {
+			FrameBuilder currentActionFrame = ActionFramesIterator.next();
+			for (Map.Entry<String, ArrayList<ArgumentBuilder>> ArgPair : currentActionFrame.arguments.entrySet()) {
 				ArrayList<ArgumentBuilder> FrameArguments = ArgPair.getValue();
 
-				for (ArgumentBuilder Arg : FrameArguments) {
-					String Word;
-					Word = Arg.word;
+				for (ArgumentBuilder currentArg : FrameArguments) {
+					String wordString;
+					wordString = currentArg.word;
 
-					if (ArgsHash.get(Word) != null) {
-						Arg = ArgsHash.get(Word);
+					if (ArgsHash.get(wordString) != null) {
+						currentArg = ArgsHash.get(wordString);
 
 					} else {
-						ArgsHash.put(Word, Arg);
-
+						ArgsHash.put(wordString, currentArg);
 					}
-					
-					ArgsHash.get(Word).argumentType = null;
-					
-					if (scoreRoot.containsKey(Word)) {
-						scoreRoot.put(Word, 1);
-					} else {
-						scoreRoot.put(Word, scoreRoot.get(Word) + 1);
-					}
-
 				}
-				
+
 			}
 		}
-		ArrayList<String> root = new ArrayList<String>();
-		int maxScore = Collections.max(scoreRoot.values());
-		Iterator<Entry<String, Integer>> rootIterator = scoreRoot.entrySet().iterator();
-		while (rootIterator.hasNext()) {
-			Entry<String, Integer> rootPair = rootIterator.next();
-			if (rootPair.getValue() == maxScore) {
-				root.add(rootPair.getKey());
-			}
-		}
-		return root;
 	}
 }

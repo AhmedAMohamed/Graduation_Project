@@ -4,19 +4,14 @@ package grad.project.srl;
 import grad.project.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class Main {
+public class Meaning {
+
 
     public static ArrayList<FrameBuilder> frames = new ArrayList<>();
 
     private static void buildDMRStepOne() throws IOException, CloneNotSupportedException {
-
-        /*
-        Here the first term part has to be called as it is and the SEPTS arraylist must be initialized
-         */
 
         String fileName = "out_4.txt";
         String line = null;
@@ -75,10 +70,7 @@ public class Main {
     }
 
     private static void enchanceFrames() throws IOException, CloneNotSupportedException {
-        buildDMRStepOne();
-        /*
-        Do first term here
-         */
+
         for(int i = 0; i < frames.size(); i++) {
             for(String key : frames.get(i).arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frames.get(i).arguments.get(key);
@@ -93,10 +85,25 @@ public class Main {
     }
 
     public static DMRGraph generateTree() throws IOException, CloneNotSupportedException {
+        buildDMRStepOne();
         enchanceFrames();
-        DMRGraph graphBuilder = new DMRGraph(frames);
-        graphBuilder.createGraph();
+        DMRGraph graph = new DMRGraph(frames);
+        graph.createGraph();
+        setScores(graph);
+        return graph;
+    }
 
-        return graphBuilder;
+    private static void setScores(DMRGraph graph) {
+        FrameBuilder.intializeConstants("A0", "A1", "A2", "A_LOC");
+        ArgumentBuilder.intializeConstants("A0", "A1", "A2", "A_LOC");
+
+        for (FrameBuilder frame :
+                graph.ActionFrames) {
+            frame.setScore();
+        }
+        for (String arg :
+                graph.ArgsHash.keySet()) {
+            graph.ArgsHash.get(arg).setScore(graph.ActionFrames);
+        }
     }
 }

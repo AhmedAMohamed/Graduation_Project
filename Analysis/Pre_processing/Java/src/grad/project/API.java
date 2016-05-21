@@ -15,7 +15,7 @@ import edu.stanford.nlp.util.IntPair;
 import grad.project.CorefInputChain.CorefNode;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import grad.project.srl.DMRGraph;
-import grad.project.srl.Main;
+import grad.project.srl.Meaning;
 
 import java.util.*;
 
@@ -140,14 +140,13 @@ public class API {
                 leafNode.ref = sourceNode;
             }
         }
-
-        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
-        String json = wordSenseRPCClient.call(message);
-        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
-        System.out.println("Dictionary: " + word_sense_dictionary);
-
-        SEPTBuilder.addWS(new HashMap<Pair, String>());
-
+        /*
+            WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
+            String json = wordSenseRPCClient.call(message);
+            HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
+            System.out.println("Dictionary: " + word_sense_dictionary);
+            SEPTBuilder.addWS(new HashMap<Pair, String>());
+        */
         String response = "";
 
         for(Node node : SEPTBuilder.SEPTs) {
@@ -155,9 +154,9 @@ public class API {
             response += (node );
             break;
         }
-        SEPTBuilder.SEPTs = new ArrayList<Node>();
-        DMRGraph result = Main.generateTree();
-
+        // why make new again??!!!
+        //SEPTBuilder.SEPTs = new ArrayList<Node>();
+        DMRGraph result = Meaning.generateTree();
         return response;
     }
 }
