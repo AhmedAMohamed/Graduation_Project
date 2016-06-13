@@ -17,13 +17,16 @@
 
 	<body>
 		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<script type="text/javascript" src="d3/d3-plugins-master/fisheye/fisheye.js"></script>
 		<link rel="stylesheet" type="text/css" href="d3/d3cssfile.css">
 		<script type="text/javascript">
 			var w = 1300;
 			var h = 700;
 			var root;
+			var nodes;
 			var maxNodeSize = 50;
-
+			var padding = 2, // separation between circles
+    			radius = 12;
 			var svg = d3.select("body").append("svg")
 						.attr("class", "container")
 				        .attr("width", w + 500)
@@ -31,13 +34,12 @@
 
 			var force = d3.layout.force()
 							 .gravity(0.05)
-							 .charge(-1500)
+							 .charge(-2000)
 		    				 .linkDistance(100)
 		   					 .friction(0.5)
 		   					 .linkStrength(1)
 		   					 .size([w, h])
-		   					 .on("tick", tick)
-		   					 .start();
+		   					 .on("tick", tick);
 
 			var link = svg.selectAll(".link"),
 			    node = svg.selectAll(".node");
@@ -69,7 +71,7 @@
 
 			function update(){
 
-				var nodes = flatten(root),
+				nodes = flatten(root),
 				links = d3.layout.tree().links(nodes);
 				
 				var maxChildrenNumber = 0;
@@ -155,11 +157,36 @@
 
 			    nodeEnter.select(".shape")
 			    			.attr("r", function(d){
-			    				
 			    				var radius = wrapNode(this.parentNode.childNodes[1], 80) / 2;
-			    				console.log('radius: ' + radius);
+			    				d.radius = radius;
+			    				console.log('radius: ' + JSON.stringify(d.children, null, 4));
 			    				return d.root1? 0: (radius + 5);
 			    			});
+
+			    var fisheye = d3.fisheye.circular()
+							      .radius(50);
+
+
+				svg.on("mousemove", function() {
+				      fisheye.focus(d3.mouse(this));
+
+				      d3.selectAll("circle.shape").each(function(d) { d.fisheye = fisheye(d); })
+				          .attr("r", function(d) { 
+			    				return d.root1? 0: (d.fisheye.z  * d.radius + 2);
+				          });
+
+				      link.attr("d", function(d) {
+						     var dx = d.target.fisheye.x - d.source.fisheye.x,
+						           dy = d.target.fisheye.y - d.source.fisheye.y,
+						           dr = Math.sqrt(dx * dx + dy * dy);
+						           return   "M" + d.source.fisheye.x + "," 
+						            + d.source.fisheye.y 
+						            + "A" + dr + "," 
+						            + dr + " 0 0,1 " 
+						            + d.target.fisheye.x + "," 
+						            + d.target.fisheye.y;
+						});   
+				    }); 
 			}
 
 			function tick() {
@@ -176,6 +203,8 @@
 			            + d.target.y;
 			  	});
 			    
+			    console.log("LENGTH" + nodes.length);
+			    node.each(collide(0.8));
 				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 			}
 
@@ -231,12 +260,6 @@
       		});
 			      return 25;
   			}
-
-			function nodeTransform(d) {
-			  		d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
-			    	d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
-			    	return "translate(" + d.x + "," + d.y + ")";
-			   }
 			
 			function click(d) {
 				if (d3.event.defaultPrevented) return;
@@ -264,6 +287,34 @@
 				 
 				  recurse(root);
 				  return nodes;
+			}
+
+
+			function collide(alpha) {
+			  var quadtree = d3.geom.quadtree(nodes);
+			  return function(d) {
+
+			    var rb = 2*d.radius + padding,
+			        nx1 = d.x - rb,
+			        nx2 = d.x + rb,
+			        ny1 = d.y - rb,
+			        ny2 = d.y + rb;
+			    quadtree.visit(function(quad, x1, y1, x2, y2) {
+			      if (quad.point && (quad.point !== d)) {
+			        var x = d.x - quad.point.x,
+			            y = d.y - quad.point.y,
+			            l = Math.sqrt(x * x + y * y);
+			          if (l < rb) {
+			          l = (l - rb) / l * alpha;
+			          d.x -= x *= l;
+			          d.y -= y *= l;
+			          quad.point.x += x;
+			          quad.point.y += y;
+			        }
+			      }
+			      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+			    });
+			  };
 			}
 		</script>
 	</body>
