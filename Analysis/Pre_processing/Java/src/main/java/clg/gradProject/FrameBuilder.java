@@ -2,12 +2,14 @@ package clg.gradProject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Created by AhmedA on 4/25/2016.
  */
 public class FrameBuilder {
 
+    public String frameID;
     public String pred;
     public int sentenceNumber;
     public int wordNumber;
@@ -27,6 +29,7 @@ public class FrameBuilder {
         this.arguments = new HashMap<String, ArrayList<ArgumentBuilder>>();
         this.index = index;
         this.score = 0;
+        this.frameID = UUID.randomUUID().toString();
     }
 
     public void addArgument(ArgumentBuilder arg) throws CloneNotSupportedException {

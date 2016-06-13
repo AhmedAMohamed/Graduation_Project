@@ -49,10 +49,10 @@ public class DMRGraph {
 					}
 					ArrayList list = argIt.relatedFrames.get(ArgPair.getKey());
 					if(list == null) {
-						argIt.relatedFrames.put(ArgPair.getKey(), new ArrayList<FrameBuilder>());
+						argIt.relatedFrames.put(ArgPair.getKey(), new ArrayList<String>());
 						list = argIt.relatedFrames.get(ArgPair.getKey());
 					}
-					list.add(ActionFrame);
+					list.add(ActionFrame.frameID);
 				}
 			}
 		}
