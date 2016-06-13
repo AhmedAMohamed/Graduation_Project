@@ -105,6 +105,13 @@
 			  	var nodeEnter = node.enter().append("g")
 							      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
 							      .on("click", click)
+							      .on("mousemove", function(){
+							      	d3.select(this).select("circle").style("stroke-width", "5px")
+							        d3.select(this).select("circle").style("fill", "#6DA69E")
+							        d3.select(this).select("text").style("fill", "#264F5C")})
+							       .on("mouseout", function(){
+							      	d3.select(this).select("circle").style("fill", "#264F5C")
+									d3.select(this).select("text").style("fill", "#ffffff")})
 							      .call(force.drag);
 
 				// Append a circle
