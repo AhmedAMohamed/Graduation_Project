@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class CorefInputChain {
 	public CorefInputChain(String corefList) {
 		corefList = corefList.substring(1, corefList.length()-1);
 		String[] list = corefList.split(",");
-		references = new ArrayList<CorefInputChain.CorefNode>(list.length - 1);
+		references = new ArrayList<CorefNode>(list.length - 1);
 		String[] sourceNode = list[0].split(" ");
 		source = new CorefNode(Integer.parseInt(sourceNode[0]),
 				Integer.parseInt(sourceNode[1]));

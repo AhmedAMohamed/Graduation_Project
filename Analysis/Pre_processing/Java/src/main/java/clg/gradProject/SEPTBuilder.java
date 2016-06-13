@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 import edu.stanford.nlp.trees.Tree;
 

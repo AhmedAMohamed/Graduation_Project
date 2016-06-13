@@ -1,7 +1,8 @@
-package grad.project.srl;
+package clg.gradProject.srl;
 
 
-import grad.project.*;
+import clg.gradProject.*;
+import se.lth.cs.srl.options.CompletePipelineCMDLineOptions;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,22 +11,39 @@ import java.util.List;
 
 public class Main {
 
-    public static ArrayList<FrameBuilder> frames = new ArrayList<>();
+    public static ArrayList<FrameBuilder> frames = new ArrayList<FrameBuilder>();
 
-    private static void buildDMRStepOne() throws IOException, CloneNotSupportedException {
+    private static CompletePipeline completePipeline = null;
+    private static CompletePipelineCMDLineOptions completePipelineCMDLineOptions;
 
+    private static void buildDMRStepOne(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
+
+        if (completePipeline == null) {
+            completePipelineCMDLineOptions = new CompletePipelineCMDLineOptions();
+            completePipelineCMDLineOptions.parseCmdLineArgs(CompletePipeline.pipelineOptions);
+
+            completePipeline = CompletePipeline.getCompletePipeline(completePipelineCMDLineOptions);
+        }
         /*
         Here the first term part has to be called as it is and the SEPTS arraylist must be initialized
          */
 
-        String fileName = "out_4.txt";
+
+        InputStream is = new ByteArrayInputStream(input.getBytes());
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        String srl_output = CompletePipeline.parseCoNLL09(completePipelineCMDLineOptions, completePipeline, bufferedReader, null) + "\n";
+        System.out.println("SRL output: " + srl_output);
+
+//        String fileName = "out_4.txt";
         String line = null;
-        FileReader fileReader = new FileReader(fileName);
+//        FileReader fileReader = new FileReader(fileName);
+//
+//        BufferedReader bufferedReader =
+//                new BufferedReader(fileReader);
+        is = new ByteArrayInputStream(srl_output.getBytes());
+        bufferedReader = new BufferedReader(new InputStreamReader(is));
 
-        BufferedReader bufferedReader =
-                new BufferedReader(fileReader);
-
-        ArrayList<WordRepresentation> words = new ArrayList<>();
+        ArrayList<WordRepresentation> words = new ArrayList<WordRepresentation>();
         int sentenceNumber = 1, wordNumber = 1;
         while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) {
             String[] parts = line.split("\\s");
@@ -43,7 +61,7 @@ public class Main {
                 wordNumber = 1;
             }
         }
-        ArrayList<ArgumentBuilder> arguments = new ArrayList<>();
+        ArrayList<ArgumentBuilder> arguments = new ArrayList<ArgumentBuilder>();
         int count = 0;
         for (WordRepresentation w : words) {
             if (w.isPredicate) {
@@ -63,6 +81,8 @@ public class Main {
                 ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
                 arguments.add(a);
             }
+            System.out.println("Word: " + w + ", predicate: " + (w.isPredicate? "YES" : "NO") + ", is argument: " +
+                    (isArgument? "YES": "NO"));
         }
 
         for(ArgumentBuilder arg : arguments) {
@@ -74,26 +94,29 @@ public class Main {
         }
     }
 
-    private static void enchanceFrames() throws IOException, CloneNotSupportedException {
-        buildDMRStepOne();
-        /*
-        Do first term here
-         */
+    private static void enchanceFrames(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
         for(int i = 0; i < frames.size(); i++) {
             for(String key : frames.get(i).arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frames.get(i).arguments.get(key);
                 for(int j = 0; j < args.size(); j++) {
+                    //System.out.println(i);
                     ArgumentBuilder word = args.get(j);
+                    System.out.println("ENHANCE: " + word);
                     Node node = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(word.sentenceNumber), word.wordNumber);
-                    word.word = node.ref.parseTreeNode.value();
+                    if (node.ref != null) {
+                        word.word = node.ref.parseTreeNode.value();
+
+                    }
                     word.ws = node.wordSense;
                 }
             }
         }
     }
 
-    public static DMRGraph generateTree() throws IOException, CloneNotSupportedException {
-        enchanceFrames();
+    public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
+        // handle error here
+        enchanceFrames(input);
+        //  buildDMRStepOne(input);
         DMRGraph graphBuilder = new DMRGraph(frames);
         graphBuilder.createGraph();
 

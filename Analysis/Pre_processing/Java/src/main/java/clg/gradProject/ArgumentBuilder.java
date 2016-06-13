@@ -1,4 +1,6 @@
-package grad.project;
+package clg.gradProject;
+
+import java.util.HashMap;
 
 /**
  * Created by AhmedA on 4/25/2016.

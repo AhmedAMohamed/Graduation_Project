@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -12,10 +12,10 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.IntPair;
-import grad.project.CorefInputChain.CorefNode;
+import clg.gradProject.CorefInputChain.CorefNode;
 import com.rabbitmq.client.AMQP.BasicProperties;
-import grad.project.srl.DMRGraph;
-import grad.project.srl.Main;
+import clg.gradProject.srl.DMRGraph;
+import clg.gradProject.srl.Main;
 
 import java.util.*;
 
@@ -79,11 +79,12 @@ public class API {
 		return trees;
 	}
 
-	public static void main(String[] args) throws Exception{
-        StartRPCClient();
+	public static void main(String[] args) throws Throwable,  Exception{
+        //StartRPCClient();
+        genTree("John gives Samantha a ball . He eats an apple .");
 	}
 
-    public static void StartRPCClient() throws Exception {
+    public static void StartRPCClient() throws Throwable, Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
 
@@ -119,7 +120,7 @@ public class API {
         }
     }
 
-    public static String genTree(String message) throws Exception {
+    public static String genTree(String message) throws Throwable, Exception {
         Annotation a = API
                 .annotate(message);
 
@@ -141,10 +142,10 @@ public class API {
             }
         }
 
-        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
-        String json = wordSenseRPCClient.call(message);
-        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
-        System.out.println("Dictionary: " + word_sense_dictionary);
+//        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
+//        String json = wordSenseRPCClient.call(message);
+//        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
+//        System.out.println("Dictionary: " + word_sense_dictionary);
 
         SEPTBuilder.addWS(new HashMap<Pair, String>());
 
@@ -155,9 +156,13 @@ public class API {
             response += (node );
             break;
         }
-        SEPTBuilder.SEPTs = new ArrayList<Node>();
-        DMRGraph result = Main.generateTree();
-
-        return response;
+        System.out.println("Now second semester code....");
+        DMRGraph result = Main.generateTree(message);
+        HashMap<String, Object> jsonRes = new HashMap<String, Object>();
+        jsonRes.put("frames", result.ActionFrames);
+        jsonRes.put("args", result.ArgsHash);
+        String jsonStringResponse = new Gson().toJson(jsonRes);
+        System.out.println("OUTPUT: " + jsonStringResponse);
+        return new Gson().toJson(jsonRes);
     }
 }

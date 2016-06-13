@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 import com.rabbitmq.client.*;
 import com.rabbitmq.client.AMQP.BasicProperties;

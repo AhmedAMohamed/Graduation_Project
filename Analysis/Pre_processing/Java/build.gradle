@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+version = '1.0'
+mainClassName = 'clg.gradProject.API'
+
+run {
+    jvmArgs "-Xmx6g"
+}
+
+repositories {
+    flatDir {
+        dirs 'src/lib'
+    }
+}
+
+dependencies {
+    compile name: 'mateplus-1.0'
+    compile name: 'anna-3.3'
+    compile name: 'rabbitmq-client'
+    compile name: 'stanford-corenlp-3.5.2'
+    compile name: 'gson-2.2.2'
+    runtime name: 'stanford-corenlp-3.5.2-models'
+    runtime name: 'ejml-0.23'
+    runtime name: 'anna-3.3'
+    runtime name: 'liblinear-java-1.95'
+}

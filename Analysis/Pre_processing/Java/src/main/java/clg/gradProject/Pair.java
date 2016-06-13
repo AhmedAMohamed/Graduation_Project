@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 /**
  * Created by AhmedA on 12/18/15.

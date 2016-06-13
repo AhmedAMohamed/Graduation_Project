@@ -1,4 +1,4 @@
-package grad.project;
+package clg.gradProject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class FrameBuilder {
         this.wordNumber = wordNumber;
         this.partOfSpeech = partOfSpeech;
         this.word = word;
-        this.arguments = new HashMap<>();
+        this.arguments = new HashMap<String, ArrayList<ArgumentBuilder>>();
         this.index = index;
     }
 
@@ -30,7 +30,7 @@ public class FrameBuilder {
         ArgumentBuilder a = (ArgumentBuilder) arg.clone();
         a.argumentTypes = new String[] {arg.argumentTypes[index]};
         a.argumentType = arg.argumentTypes[index];
-        ArrayList<ArgumentBuilder> list = new ArrayList<>();
+        ArrayList<ArgumentBuilder> list = new ArrayList<ArgumentBuilder>();
         list.add(a);
         arguments.put(a.argumentType, list);
     }
