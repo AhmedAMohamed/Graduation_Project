@@ -121,7 +121,10 @@ public class Main {
         enchanceFrames(input);
         DMRGraph graphBuilder = new DMRGraph(frames);
         graphBuilder.createGraph();
+        graphBuilder.setScores();
 
+        KMeans kmeans = new KMeans(graphBuilder, 3);
+        System.out.println(kmeans.Clusters.size());
         return graphBuilder;
     }
 }
