@@ -15,6 +15,8 @@ public class FrameBuilder {
     public String word;
     public HashMap<String, ArrayList<ArgumentBuilder>> arguments;
     public int index;
+    public double score;
+
 
     public FrameBuilder(String pred, int sentenceNumber, int wordNumber, String partOfSpeech, String word, int index) {
         this.pred = pred;
@@ -24,6 +26,7 @@ public class FrameBuilder {
         this.word = word;
         this.arguments = new HashMap<String, ArrayList<ArgumentBuilder>>();
         this.index = index;
+        this.score = 0;
     }
 
     public void addArgument(ArgumentBuilder arg) throws CloneNotSupportedException {
@@ -37,6 +40,14 @@ public class FrameBuilder {
 
     public ArgumentBuilder findArgumentByType(String type) {
         return arguments.get(type).get(0);
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public double getScore() {
+        return this.score;
     }
 
     @Override

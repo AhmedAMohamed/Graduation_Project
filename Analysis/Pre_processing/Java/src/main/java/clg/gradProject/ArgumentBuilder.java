@@ -1,5 +1,6 @@
 package clg.gradProject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,6 +14,8 @@ public class ArgumentBuilder implements Cloneable {
     public String[] argumentTypes;
     public String argumentType;
     public String ws;
+    public HashMap<String, ArrayList<FrameBuilder>> relatedFrames;
+    public double score;
 
     public ArgumentBuilder(int sentenceNumber, int wordNumber, String partOfSpeech, String word, String[] argumentTypes, String argumentType) {
         this.sentenceNumber = sentenceNumber;
@@ -21,8 +24,13 @@ public class ArgumentBuilder implements Cloneable {
         this.word = word;
         this.argumentTypes = argumentTypes;
         this.argumentType = argumentType;
+        this.relatedFrames = new HashMap<String, ArrayList<FrameBuilder>>();
+        this.score = 0;
     }
 
+    public void setScore(double score) {
+        this.score = score;
+    }
 
     @Override
     public String toString() {

@@ -159,10 +159,11 @@ public class API {
         System.out.println("Now second semester code....");
         DMRGraph result = Main.generateTree(message);
         HashMap<String, Object> jsonRes = new HashMap<String, Object>();
-        jsonRes.put("frames", result.ActionFrames);
-        jsonRes.put("args", result.ArgsHash);
-        String jsonStringResponse = new Gson().toJson(jsonRes);
-        System.out.println("OUTPUT: " + jsonStringResponse);
-        return new Gson().toJson(jsonRes);
+        //jsonRes.put("frames", result.ActionFrames);
+        //jsonRes.put("args", result.ArgsHash);
+        //String jsonStringResponse = new Gson().toJson(jsonRes);
+        //System.out.println("OUTPUT: " + jsonStringResponse);
+        //return new Gson().toJson(jsonRes);
+        return "";
     }
 }

@@ -24,10 +24,6 @@ public class Main {
 
             completePipeline = CompletePipeline.getCompletePipeline(completePipelineCMDLineOptions);
         }
-        /*
-        Here the first term part has to be called as it is and the SEPTS arraylist must be initialized
-         */
-
 
         InputStream is = new ByteArrayInputStream(input.getBytes());
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
@@ -78,8 +74,14 @@ public class Main {
                 }
             }
             if (isArgument) {
-                ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
-                arguments.add(a);
+                if(w.partOfSpeech.startsWith("D") || w.partOfSpeech.startsWith("V")) {
+                    continue;
+                }
+                else {
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
+                    arguments.add(a);
+                }
+
             }
             System.out.println("Word: " + w + ", predicate: " + (w.isPredicate? "YES" : "NO") + ", is argument: " +
                     (isArgument? "YES": "NO"));
@@ -115,8 +117,8 @@ public class Main {
 
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
         // handle error here
+        buildDMRStepOne(input);
         enchanceFrames(input);
-        //  buildDMRStepOne(input);
         DMRGraph graphBuilder = new DMRGraph(frames);
         graphBuilder.createGraph();
 
