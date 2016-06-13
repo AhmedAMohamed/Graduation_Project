@@ -81,8 +81,13 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("Ahmed gives Samantha a ball . He eats an apple .");
-	}
+        genTree("John gives Samantha a ball . He eats an apple . He drinks tea . She plays football .");
+
+        for (int i=0;i<10;i++) {
+            UUID uuid = UUID.randomUUID();
+            System.out.println(uuid.toString());
+        }
+    }
 
     public static void StartRPCClient() throws Throwable, Exception {
         ConnectionFactory factory = new ConnectionFactory();
@@ -120,20 +125,6 @@ public class API {
         }
     }
 
-    public static HashMap<Pair, String> getWordSense(String message) throws Exception {
-        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
-        String json = wordSenseRPCClient.call(message);
-        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
-
-        HashMap<Pair, String> convertedWSDictionary = new HashMap<Pair, String>();
-        for (String keyPair: word_sense_dictionary.keySet()) {
-            String[] indicies = keyPair.split(" ", 2);
-            Pair pair = new Pair(Integer.parseInt(indicies[0]), Integer.parseInt(indicies[1]));
-            convertedWSDictionary.put(pair, word_sense_dictionary.get(keyPair));
-        }
-        return convertedWSDictionary;
-    }
-
     public static String genTree(String message) throws Throwable, Exception {
         Annotation a = API
                 .annotate(message);
@@ -156,8 +147,12 @@ public class API {
             }
         }
 
-        // Comment this line to remove unnecessary RPC for wordsense
-        //SEPTBuilder.addWS(getWordSense(message));
+//        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
+//        String json = wordSenseRPCClient.call(message);
+//        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
+//        System.out.println("Dictionary: " + word_sense_dictionary);
+
+        SEPTBuilder.addWS(new HashMap<Pair, String>());
 
         String response = "";
 

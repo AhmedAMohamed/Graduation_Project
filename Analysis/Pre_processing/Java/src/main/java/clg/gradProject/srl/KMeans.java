@@ -13,17 +13,24 @@ import static java.lang.Math.sqrt;
  */
 public class KMeans {
     int K;
-    ArrayList<Float> Centroids,OldCentroids;
-    ArrayList<ArgumentBuilder>InputFrames;
-    ArrayList<ArrayList<ArgumentBuilder>>Clusters;  //Clusters Created according to the value of k
+    ArrayList<Double> Centroids,OldCentroids;
+    ArrayList<FrameBuilder>InputFrames;
+    ArrayList<ArrayList<FrameBuilder>>Clusters;  //Clusters Created according to the value of k
     ArrayList<Double> Distances; //Distances between the data item and the centroids
     public KMeans(DMRGraph graph,int k){
+
+        InputFrames = graph.ActionFrames;
+        Centroids = new ArrayList();
+        OldCentroids = new ArrayList();
+        Clusters = new ArrayList();
+        Distances = new ArrayList();
+
         this.K=k;
         //Choose the initial clusters
         Random generator =new Random();
         for (int i = 0; i < K; i++) {
 
-            int centroidID=generator.nextInt()%InputFrames.size();
+            int centroidID=generator.nextInt(InputFrames.size());
 
             Centroids.add(InputFrames.get(centroidID).score);
             //Add the centroid to the cluster
@@ -32,8 +39,8 @@ public class KMeans {
         }
         int iter=1;
         do{
-        for( ArgumentBuilder arg:InputFrames){
-            for(float centroid :Centroids){
+        for( FrameBuilder arg:InputFrames){
+            for(double centroid :Centroids){
                 double dist=abs(centroid-arg.score);
                 Distances.add(dist);
             }
@@ -58,15 +65,13 @@ public class KMeans {
                 }
             }
             iter++;
-
         }
         while(!Centroids.equals(OldCentroids));
-
     }
 
-    public static float average(ArrayList<ArgumentBuilder> list) {
-        float sum = 0;
-        for (ArgumentBuilder value : list) {
+    public static double average(ArrayList<FrameBuilder> list) {
+        double sum = 0;
+        for (FrameBuilder value : list) {
             sum = sum + value.score;
         }
         return sum / list.size();
