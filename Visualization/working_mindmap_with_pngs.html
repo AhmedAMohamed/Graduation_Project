@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+	<head>
+		<link rel='stylesheet' type='text/css' href='css/style.css'/>
+		<style type="text/css">
+			.link {
+			  stroke: #6DA69E;
+			  stroke-opacity: .9;
+				fill: none;
+				stroke: url(#line-gradient);
+				stroke-width: 15px;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<link rel="stylesheet" type="text/css" href="d3/d3cssfile.css">
+		<script type="text/javascript">
+			var w = 1300;
+			var h = 700;
+			var root;
+			var maxNodeSize = 50;
+
+			var svg = d3.select("body").append("svg")
+						.attr("class", "container")
+				        .attr("width", w + 500)
+				        .attr("height", h + 300);
+
+			var force = d3.layout.force()
+							 .gravity(0.05)
+							 .charge(-1500)
+		    				 .linkDistance(100)
+		   					 .friction(0.5)
+		   					 .linkStrength(1)
+		   					 .size([w, h])
+		   					 .on("tick", tick)
+		   					 .start();
+
+			var link = svg.selectAll(".link"),
+			    node = svg.selectAll(".node");
+
+
+			svg.append("linearGradient")
+					.attr("id", "line-gradient")
+					.attr("gradientUnits", "objectBoundingBox")
+					.selectAll("stop")
+					.data([
+					{offset: "0%", color: "#6DA69E"},
+					{offset: "80%", color: "#3A656E"},
+					{offset: "100%", color: "#264F5C"}
+					])
+					.enter().append("stop")
+					.attr("offset", function(d) { return d.offset; })
+					.attr("stop-color", function(d) { return d.color; });
+
+
+			d3.json("output-temp-simple.json", function(error, json) {
+				root = json;
+				root.fixed = true;
+				root.x = w/2;
+				root.y = h/2;
+
+				update();
+				
+		});
+
+			function update(){
+
+				var nodes = flatten(root),
+				links = d3.layout.tree().links(nodes);
+				
+				var maxChildrenNumber = 0;
+						nodes.forEach(function(d){
+							if(d.children)
+							maxChildrenNumber = d.children.length > maxChildrenNumber ? d.children.length : maxChildrenNumber;
+						});
+
+				force.nodes(nodes)
+					 .links(links)
+					 .linkDistance(function(d, i){
+
+					 	console.log("linkDistance: " + "d: " + JSON.stringify(d,null,4) + ", i: " + i);
+						var min_d = 80, max_d = 150, min_i = 0, max_i = 9, t = d.source.children.length; 
+					 	return min_d + ( t / max_i) * (max_d - min_d);
+					 })
+					 .on("tick", tick)
+					 .start();
+	   			
+	   			link = link.data(links, function(d){ return d.target.id;});
+	   			
+	   			link.exit().remove();
+
+	   			link.enter().insert("path", ".node")
+      						.attr("class", "link");	
+
+				node = node.data(nodes, function(d){ return d.id;});
+				node.exit().remove();
+ 
+			  	// Enter any new nodes.
+			  	var nodeEnter = node.enter().append("g")
+							      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
+							      .on("click", click)
+							      .call(force.drag);
+
+				// Append a circle
+				nodeEnter.append("svg:circle")
+					      //.attr("r", function(d){return d.root1? 0:25;})
+					      .attr("class", "shape")
+					      .style("fill", function(d){
+					      	return d.root1? "":"#264F5C";
+					      })
+					      .style("stroke-width", 1.5);
+				
+		   		nodeEnter.append("svg:image")
+								      .attr("xlink:href", function(d){
+								      	return d.root1? "center_node_out.png":"";
+								      })
+								      .attr("width", "150px")
+								      .attr("height", "150px")
+								      .attr("align","center")
+								      .attr("class",function(d){ return d.root1? "":"img_remove"})
+								      .attr("x", -150/2)
+								      .attr("y", -150/2);
+
+
+   				// png works
+   				nodeEnter.append("svg:image")
+								      .attr("xlink:href", function(d){
+								      	return d.root1? "center_node_group.png":"";
+								      })
+								      .attr("width", "100px")
+								      .attr("height", "100px")
+								      .attr("align","center")
+								      .attr("class",function(d){ return d.root1? "":"img_remove"})
+								      .attr("x", -100/2)
+								      .attr("y", -100/2);
+
+				nodeEnter.selectAll(".img_remove").remove();
+
+				nodeEnter.append("text")
+				          .attr("dy", ".35em")
+				          .attr("text-anchor", "middle")
+				          .style("font-size", 12)
+				          .style("fill", function(d){return d.root1? "#ffffff":"#ffffff";});
+
+			    nodeEnter.selectAll("text")
+			    		 .text(function(d){return d.name;});
+
+			    //var leafRadius = 25;
+			    //leafRadius = wrap(d3.selectAll('text'), 100);
+			    //console.log("leafRadius: " + leafRadius);
+
+			    nodeEnter.select(".shape")
+			    			.attr("r", function(d){
+			    				
+			    				var radius = wrapNode(this.parentNode.childNodes[1], 80) / 2;
+			    				console.log('radius: ' + radius);
+			    				return d.root1? 0: (radius + 5);
+			    			});
+			}
+
+			function tick() {
+				link.attr("d", function(d) {
+			 
+			     var dx = d.target.x - d.source.x,
+			           dy = d.target.y - d.source.y,
+			           dr = Math.sqrt(dx * dx + dy * dy);
+			           return   "M" + d.source.x + "," 
+			            + d.source.y 
+			            + "A" + dr + "," 
+			            + dr + " 0 0,1 " 
+			            + d.target.x + "," 
+			            + d.target.y;
+			  	});
+			    
+				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+			}
+
+			function calculateLeafRadius(maxTextWidth, lineNumber){
+				return maxTextWidth > (lineNumber * 30) ? maxTextWidth : (lineNumber * 30);
+			}
+
+			function wrapNode(thisText, width) {
+			        var text = d3.select(thisText),
+					words = text.text().split(/\s+/).reverse(),
+			          word,
+			          line = [],
+			          lineHeight = 1.1, // ems
+			          y = text.attr("y"),
+			          dy = parseFloat(text.attr("dy")),
+			          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+			          //console.log("shape text: " + JSON.stringify(text, null, 4)),
+			          lineNumber = 0,
+			          maxTextWidth = 0;
+			        while (word = words.pop()) {
+			          line.push(word);
+			          tspan.text(line.join(" "));
+			          if (tspan.node().getComputedTextLength() > width) {
+
+			            line.pop();
+			            tspan.text(line.join(" "));
+
+			          	maxTextWidth = tspan.node().getComputedTextLength() > maxTextWidth ?
+			          			 tspan.node().getComputedTextLength() : maxTextWidth;
+
+			            line = [word];
+			            tspan = text.append("tspan").attr("x", 0).attr("y", y)
+			            		.attr("dy", 15) //height
+			            		.text(word);
+
+			            lineNumber++;
+			          }
+			        }
+			        	maxTextWidth = tspan.node().getComputedTextLength() > maxTextWidth ?
+			          			 tspan.node().getComputedTextLength() : maxTextWidth;
+			        
+			        //d3.select(thisText.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
+			        console.log("____");
+			        console.log("maxTextWidth: " + maxTextWidth);
+			        console.log("lineNumber: " + lineNumber);
+			        console.log("text: " + text.text());
+			        return calculateLeafRadius(maxTextWidth, lineNumber);
+			}
+			function wrap(text, width) {
+				var maxTextWidth = 10;
+			      text.each(function() {
+			        wrapNode(this, width);
+      		});
+			      return 25;
+  			}
+
+			function nodeTransform(d) {
+			  		d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
+			    	d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
+			    	return "translate(" + d.x + "," + d.y + ")";
+			   }
+			
+			function click(d) {
+				if (d3.event.defaultPrevented) return;
+				if (d.children) {
+					d._children = d.children;
+					d.children = null;
+				} else {
+					d.children = d._children;
+					d._children = null;
+				}
+				update();
+			}
+
+			function flatten(root) {
+				  var nodes = []; 
+				  var i = 0;
+				 
+				  function recurse(node) {
+				    if (node.children) 
+				      node.children.forEach(recurse);
+				    if (!node.id) 
+				      node.id = ++i;
+				    nodes.push(node);
+				  }
+				 
+				  recurse(root);
+				  return nodes;
+			}
+		</script>
+	</body>
+</html>
