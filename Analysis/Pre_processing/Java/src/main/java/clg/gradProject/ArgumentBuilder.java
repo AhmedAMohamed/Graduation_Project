@@ -26,6 +26,7 @@ public class ArgumentBuilder implements Cloneable {
         this.argumentType = argumentType;
         this.relatedFrames = new HashMap<String, ArrayList<String>>();
         this.score = 0;
+        this.ws = new String();
     }
 
     public void setScore(double score) {

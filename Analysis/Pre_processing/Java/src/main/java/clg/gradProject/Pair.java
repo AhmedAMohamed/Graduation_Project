@@ -8,6 +8,11 @@ public class Pair {
 	private int wordIndex;
 	private int sentenceIndex;
 
+	public Pair(int wordIndex, int sentenceIndex) {
+		this.wordIndex = wordIndex;
+		this.sentenceIndex = sentenceIndex;
+	}
+
 	public int getWordIndex() {
 		return wordIndex;
 	}
@@ -22,12 +27,6 @@ public class Pair {
 
 	public void setSentenceIndex(int sentenceIndex) {
 		this.sentenceIndex = sentenceIndex;
-	}
-
-	@Override
-	public String toString() {
-		return "Pair{" + "wordIndex=" + wordIndex + ", sentenceIndex="
-				+ sentenceIndex + '}';
 	}
 
 	@Override
@@ -50,5 +49,10 @@ public class Pair {
 		int result = wordIndex;
 		result = 31 * result + sentenceIndex;
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return wordIndex + ", " + sentenceIndex;
 	}
 }

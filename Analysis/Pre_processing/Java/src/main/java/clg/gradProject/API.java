@@ -81,7 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("John gives Samantha a ball . He eats an apple .");
+        genTree("Ahmed gives Samantha a ball . He eats an apple .");
 	}
 
     public static void StartRPCClient() throws Throwable, Exception {
@@ -142,12 +142,18 @@ public class API {
             }
         }
 
-//        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
-//        String json = wordSenseRPCClient.call(message);
-//        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
-//        System.out.println("Dictionary: " + word_sense_dictionary);
+        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
+        String json = wordSenseRPCClient.call(message);
+        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
 
-        SEPTBuilder.addWS(new HashMap<Pair, String>());
+        HashMap<Pair, String> convertedWSDictionary = new HashMap<Pair, String>();
+        for (String keyPair: word_sense_dictionary.keySet()) {
+            String[] indicies = keyPair.split(" ", 2);
+            Pair pair = new Pair(Integer.parseInt(indicies[0]), Integer.parseInt(indicies[1]));
+            convertedWSDictionary.put(pair, word_sense_dictionary.get(keyPair));
+        }
+
+        SEPTBuilder.addWS(convertedWSDictionary);
 
         String response = "";
 
@@ -156,7 +162,9 @@ public class API {
             response += (node );
             break;
         }
+        System.out.println("Dict: " + convertedWSDictionary);
         System.out.println("Now second semester code....");
+
         DMRGraph result = Main.generateTree(message);
         HashMap<String, Object> jsonRes = new HashMap<String, Object>();
         jsonRes.put("frames", result.ActionFrames);
