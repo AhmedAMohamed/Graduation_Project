@@ -8,3 +8,9 @@
 *.xml
 *.iml
 *.jar
+*.model
+*.bin
+*.properties
+*.bat
+gradlew
+*.lock

@@ -52,7 +52,7 @@ public class Main {
             WordRepresentation w = new WordRepresentation(position, word, partOfSpeech, isPredicate, argument, sentenceNumber, wordNumber, pred);
             words.add(w);
             wordNumber++;
-            if (word.equals(".")) {
+            if (word.endsWith(".")) {
                 sentenceNumber++;
                 wordNumber = 1;
             }

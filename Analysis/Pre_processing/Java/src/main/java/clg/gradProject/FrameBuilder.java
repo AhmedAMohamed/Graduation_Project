@@ -36,7 +36,8 @@ public class FrameBuilder {
         ArgumentBuilder a = (ArgumentBuilder) arg.clone();
         a.argumentTypes = new String[] {arg.argumentTypes[index]};
         a.argumentType = arg.argumentTypes[index];
-        ArrayList<ArgumentBuilder> list = new ArrayList<ArgumentBuilder>();
+        ArrayList<ArgumentBuilder> list = arguments.get(a.argumentType);
+        if(list == null) list = new ArrayList<>();
         list.add(a);
         arguments.put(a.argumentType, list);
     }
