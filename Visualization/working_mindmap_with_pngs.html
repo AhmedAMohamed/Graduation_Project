@@ -84,7 +84,6 @@
 					 .links(links)
 					 .linkDistance(function(d, i){
 
-					 	console.log("linkDistance: " + "d: " + JSON.stringify(d,null,4) + ", i: " + i);
 						var min_d = 80, max_d = 150, min_i = 0, max_i = 9, t = d.source.children.length; 
 					 	return min_d + ( t / max_i) * (max_d - min_d);
 					 })
@@ -105,13 +104,8 @@
 			  	var nodeEnter = node.enter().append("g")
 							      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
 							      .on("click", click)
-							      .on("mousemove", function(){
-							      	d3.select(this).select("circle").style("stroke-width", "5px")
-							        d3.select(this).select("circle").style("fill", "#6DA69E")
-							        d3.select(this).select("text").style("fill", "#264F5C")})
-							       .on("mouseout", function(){
-							      	d3.select(this).select("circle").style("fill", "#264F5C")
-									d3.select(this).select("text").style("fill", "#ffffff")})
+							      .on("mousemove", mousemoveNodes)
+							      .on("mouseout", mouseoutNodes)
 							      .call(force.drag);
 
 				// Append a circle
@@ -120,8 +114,7 @@
 					      .attr("class", "shape")
 					      .style("fill", function(d){
 					      	return d.root1? "":"#264F5C";
-					      })
-					      .style("stroke-width", 1.5);
+					      });
 				
 		   		nodeEnter.append("svg:image")
 								      .attr("xlink:href", function(d){
@@ -160,13 +153,11 @@
 
 			    //var leafRadius = 25;
 			    //leafRadius = wrap(d3.selectAll('text'), 100);
-			    //console.log("leafRadius: " + leafRadius);
 
 			    nodeEnter.select(".shape")
 			    			.attr("r", function(d){
 			    				var radius = wrapNode(this.parentNode.childNodes[1], 80) / 2;
 			    				d.radius = radius;
-			    				console.log('radius: ' + JSON.stringify(d.children, null, 4));
 			    				return d.root1? 0: (radius + 5);
 			    			});
 
@@ -210,9 +201,32 @@
 			            + d.target.y;
 			  	});
 			    
-			    console.log("LENGTH" + nodes.length);
 			    node.each(collide(0.8));
 				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+			}
+
+			function mousemoveNodes(){
+				d3.select(this).select("circle").style("fill", "#6DA69E")
+				d3.select(this).select("text").style("fill", function(d){
+					return d.root1? "#ffffff":"#264F5C";
+				})
+
+				if(d3.select(this)[0][0].__data__._children && d3.select(this)[0][0].__data__._children.length > 0){ 
+					//collapsed
+					d3.select(this).select("circle").style("stroke", "#264F5C")
+					d3.select(this).select("circle").style("stroke-width", 5)
+				}
+			}
+
+			function mouseoutNodes(){
+				d3.select(this).select("circle").style("fill", "#264F5C")
+				d3.select(this).select("text").style("fill", "#ffffff")
+
+				if(d3.select(this)[0][0].__data__._children && d3.select(this)[0][0].__data__._children.length > 0){ 
+					//collapsed
+					d3.select(this).select("circle").style("stroke", "#6DA69E")
+					d3.select(this).select("circle").style("stroke-width", 5)
+				}
 			}
 
 			function calculateLeafRadius(maxTextWidth, lineNumber){
@@ -228,7 +242,7 @@
 			          y = text.attr("y"),
 			          dy = parseFloat(text.attr("dy")),
 			          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-			          //console.log("shape text: " + JSON.stringify(text, null, 4)),
+			          
 			          lineNumber = 0,
 			          maxTextWidth = 0;
 			        while (word = words.pop()) {
@@ -253,15 +267,11 @@
 			        	maxTextWidth = tspan.node().getComputedTextLength() > maxTextWidth ?
 			          			 tspan.node().getComputedTextLength() : maxTextWidth;
 			        
-			        //d3.select(thisText.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
-			        console.log("____");
-			        console.log("maxTextWidth: " + maxTextWidth);
-			        console.log("lineNumber: " + lineNumber);
-			        console.log("text: " + text.text());
+			        d3.select(thisText.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
+
 			        return calculateLeafRadius(maxTextWidth, lineNumber);
 			}
 			function wrap(text, width) {
-				var maxTextWidth = 10;
 			      text.each(function() {
 			        wrapNode(this, width);
       		});
@@ -271,11 +281,22 @@
 			function click(d) {
 				if (d3.event.defaultPrevented) return;
 				if (d.children) {
+
+					if(d3.select(this)[0][0].__data__.children.length > 0){
+						d3.select(this).select("circle")
+							.style("stroke", "#6DA69E")
+							.style("stroke-width", 5);
+					}
+
 					d._children = d.children;
 					d.children = null;
+
 				} else {
 					d.children = d._children;
 					d._children = null;
+
+					d3.select(this).select("circle")
+							.style("stroke-width", 0);
 				}
 				update();
 			}
