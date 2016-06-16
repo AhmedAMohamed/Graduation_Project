@@ -125,6 +125,21 @@ public class API {
         }
     }
 
+    public static HashMap<Pair, String> getWordSense(String message) throws Exception {
+        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
+        String json = wordSenseRPCClient.call(message);
+        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
+
+        HashMap<Pair, String> convertedWSDictionary = new HashMap<Pair, String>();
+        for (String keyPair: word_sense_dictionary.keySet()) {
+            String[] indicies = keyPair.split(" ", 2);
+            Pair pair = new Pair(Integer.parseInt(indicies[0]), Integer.parseInt(indicies[1]));
+            convertedWSDictionary.put(pair, word_sense_dictionary.get(keyPair));
+        }
+      return convertedWSDictionary;
+    }
+
+
     public static String genTree(String message) throws Throwable, Exception {
         Annotation a = API
                 .annotate(message);
@@ -147,12 +162,8 @@ public class API {
             }
         }
 
-//        WordSenseRPCClient wordSenseRPCClient = new WordSenseRPCClient();
-//        String json = wordSenseRPCClient.call(message);
-//        HashMap<String, String> word_sense_dictionary = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>(){}.getType());
-//        System.out.println("Dictionary: " + word_sense_dictionary);
-
-        SEPTBuilder.addWS(new HashMap<Pair, String>());
+        // Comment this line to remove unnecessary RPC for wordsense
+        //SEPTBuilder.addWS(getWordSense(message));
 
         String response = "";
 
