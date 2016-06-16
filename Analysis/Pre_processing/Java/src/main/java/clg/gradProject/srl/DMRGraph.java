@@ -3,6 +3,7 @@ package clg.gradProject.srl;
 import clg.gradProject.ArgumentBuilder;
 import clg.gradProject.FrameBuilder;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -20,9 +21,38 @@ public class DMRGraph {
 		ARGSCORES = new HashMap<String, Double>();
 		ACTIONSCORE = new HashMap<String, Double>();
 		for (int i = 0; i < 10; i++) {
-			ARGSCORES.put("A"+i, new Random().nextDouble());
+			ARGSCORES.put("A"+i, 1.0);
 			ACTIONSCORE.put("A"+i, 1.5);
 		}
+	}
+
+	DMRGraph (DMRGraph pre_graph,  ArrayList<ArrayList<FrameBuilder>> clusters) {
+		this.ArgsHash = pre_graph.ArgsHash;
+		ArrayList<FrameBuilder> nextLevel = getMaxCluster(clusters);
+		FrameBuilder nextLevelFrame = new FrameBuilder("Level two", 0, 0, "", "Level two", 0);
+		nextLevelFrame.nextLevel = nextLevel;
+		this.ActionFrames = new ArrayList();
+		ActionFrames.add(nextLevelFrame);
+		for(FrameBuilder frame : pre_graph.ActionFrames) {
+			if(!nextLevel.contains(frame)) {
+				ActionFrames.add(frame);
+			}
+		}
+	}
+
+	private ArrayList<FrameBuilder> getMaxCluster(ArrayList<ArrayList<FrameBuilder>> clusters) {
+		int maxClusterIndex = 0;
+		int index = 0;
+		int maxSize = 0;
+		for (ArrayList<FrameBuilder> cluster : clusters) {
+			if(cluster.size() > maxSize) {
+				maxSize = cluster.size();
+				maxClusterIndex = index;
+			}
+			index++;
+		}
+
+		return clusters.get(maxClusterIndex);
 	}
 
 	public void createGraph() {

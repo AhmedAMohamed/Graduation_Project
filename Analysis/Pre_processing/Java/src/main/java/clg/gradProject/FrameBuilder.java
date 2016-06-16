@@ -18,7 +18,7 @@ public class FrameBuilder {
     public HashMap<String, ArrayList<ArgumentBuilder>> arguments;
     public int index;
     public double score;
-
+    public ArrayList<FrameBuilder> nextLevel;
 
     public FrameBuilder(String pred, int sentenceNumber, int wordNumber, String partOfSpeech, String word, int index) {
         this.pred = pred;

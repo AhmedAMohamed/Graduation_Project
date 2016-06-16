@@ -119,12 +119,15 @@ public class Main {
         // handle error here
         buildDMRStepOne(input);
         enchanceFrames(input);
-        DMRGraph graphBuilder = new DMRGraph(frames);
-        graphBuilder.createGraph();
-        graphBuilder.setScores();
+        DMRGraph singleLevelGraph = new DMRGraph(frames);
+        singleLevelGraph.createGraph();
+        singleLevelGraph.setScores();
 
-        KMeans kmeans = new KMeans(graphBuilder, 3);
-        System.out.println(kmeans.Clusters.size());
-        return graphBuilder;
+        KMeans clusters = new KMeans(singleLevelGraph, 3);
+
+        DMRGraph multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
+        System.out.println(multiLevelGraph.ArgsHash.size());
+        System.out.println(clusters.Clusters.size());
+        return singleLevelGraph;
     }
 }
