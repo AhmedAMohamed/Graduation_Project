@@ -1,7 +1,7 @@
-package clg.gradProject.srl;
+package Analysis.Pre_processing.Java.src.main.java.clg.gradProject.srl;
 
 
-import clg.gradProject.*;
+import Analysis.Pre_processing.Java.src.main.java.clg.gradProject.*;
 import se.lth.cs.srl.options.CompletePipelineCMDLineOptions;
 
 import java.io.*;
@@ -52,7 +52,7 @@ public class Main {
             WordRepresentation w = new WordRepresentation(position, word, partOfSpeech, isPredicate, argument, sentenceNumber, wordNumber, pred);
             words.add(w);
             wordNumber++;
-            if (word.endsWith(".")) {
+            if (word.equals(".")) {
                 sentenceNumber++;
                 wordNumber = 1;
             }
@@ -125,6 +125,8 @@ public class Main {
 
         KMeans kmeans = new KMeans(graphBuilder, 3);
         System.out.println(kmeans.Clusters.size());
+        
+        MeaningDistance largestCluster = new MeaningDistance(kmeans.Clusters);
         return graphBuilder;
     }
 }
