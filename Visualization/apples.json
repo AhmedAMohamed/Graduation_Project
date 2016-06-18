@@ -24,6 +24,7 @@
 				{
 					"name" : "Samantha",
 					"our_id": 4,
+					"paths": [0],
 					"is_passive" : false,
 					"children" : []
 				}
