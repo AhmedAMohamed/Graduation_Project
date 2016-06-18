@@ -81,8 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("John gives Samantha a ball . She eats an apple . He drinks tea . She plays football .");
-
+        genTree("Shakespeare is a great writer in the history of literature . He was born in 1564 . He had 3 children . He was earning his living from agriculture products . He lived in Stanford . He wrote 38 good plays . He loves acting and writing . He performed before the queen in 1594 . He died in 1616 .");
         for (int i=0;i<10;i++) {
             UUID uuid = UUID.randomUUID();
             System.out.println(uuid.toString());
