@@ -7,6 +7,7 @@ import se.lth.cs.srl.options.CompletePipelineCMDLineOptions;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Main {
@@ -60,9 +61,15 @@ public class Main {
         ArrayList<ArgumentBuilder> arguments = new ArrayList<ArgumentBuilder>();
         int count = 0;
         for (WordRepresentation w : words) {
-            if (w.isPredicate && !w.partOfSpeech.startsWith("N")) {
-                FrameBuilder f = new FrameBuilder(w.pred, w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, count++);
-                frames.add(f);
+            if (w.isPredicate) {
+                if(w.partOfSpeech.startsWith("N")) {
+                    FrameBuilder f = new FrameBuilder(w.pred, -1, -1, w.partOfSpeech, w.word, count++);
+                    frames.add(f);
+                }
+                else {
+                    FrameBuilder f = new FrameBuilder(w.pred, w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, count++);
+                    frames.add(f);
+                }
             }
             boolean isArgument = false;
             int argNumber = 0;
@@ -74,7 +81,7 @@ public class Main {
                 }
             }
             if (isArgument) {
-                if(w.partOfSpeech.startsWith("V")) {
+                if (w.partOfSpeech.startsWith("V")) {
                    /* String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.value();
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
                     arguments.add(a);
@@ -92,24 +99,32 @@ public class Main {
                 }
 
             }
-            System.out.println("Word: " + w + ", predicate: " + (w.isPredicate? "YES" : "NO") + ", is argument: " +
-                    (isArgument? "YES": "NO"));
+            System.out.println("Word: " + w + ", predicate: " + (w.isPredicate ? "YES" : "NO") + ", is argument: " +
+                    (isArgument ? "YES" : "NO"));
         }
 
-        for(ArgumentBuilder arg : arguments) {
-            for(int i = 0; i < arg.argumentTypes.length; ++i) {
-                if(!arg.argumentTypes[i].equals("_")) {
+        for (ArgumentBuilder arg : arguments) {
+            for (int i = 0; i < arg.argumentTypes.length; ++i) {
+                if (!arg.argumentTypes[i].equals("_")) {
                     frames.get(i).addArgument(arg);
                 }
             }
         }
+
+        for (Iterator<FrameBuilder> it = frames.iterator(); it.hasNext();){
+            FrameBuilder f = it.next();
+            if (f.sentenceNumber == -1 && f.wordNumber == -1){
+                it.remove();
+            }
+        }
+
     }
 
-    private static void enchanceFrames(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
-        for(int i = 0; i < frames.size(); i++) {
-            for(String key : frames.get(i).arguments.keySet()) {
+    private static void enchanceFrames() throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
+        for (int i = 0; i < frames.size(); i++) {
+            for (String key : frames.get(i).arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frames.get(i).arguments.get(key);
-                for(int j = 0; j < args.size(); j++) {
+                for (int j = 0; j < args.size(); j++) {
                     //System.out.println(i);
                     ArgumentBuilder word = args.get(j);
                     System.out.println("ENHANCE: " + word);
@@ -126,9 +141,8 @@ public class Main {
     }
 
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
-        // handle error here
         buildDMRStepOne(input);
-        enchanceFrames(input);
+        enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
         singleLevelGraph.createGraph();
         singleLevelGraph.setScores();
