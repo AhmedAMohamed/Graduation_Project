@@ -60,7 +60,7 @@ public class Main {
         ArrayList<ArgumentBuilder> arguments = new ArrayList<ArgumentBuilder>();
         int count = 0;
         for (WordRepresentation w : words) {
-            if (w.isPredicate) {
+            if (w.isPredicate && !w.partOfSpeech.startsWith("N")) {
                 FrameBuilder f = new FrameBuilder(w.pred, w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, count++);
                 frames.add(f);
             }
@@ -74,9 +74,18 @@ public class Main {
                 }
             }
             if (isArgument) {
-                if(w.partOfSpeech.startsWith("D") || w.partOfSpeech.startsWith("V")) {
-                    continue;
+                if(w.partOfSpeech.startsWith("V")) {
+                    String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.nodeString();
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
+                    arguments.add(a);
+
+                } else if(!w.partOfSpeech.startsWith("N")) {
+                    Node n = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), w.wordNumber);
+                    String val = n.parseTreeNode.parent().nodeString();
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val, w.argument, w.argument[argNumber]);
+                    arguments.add(a);
                 }
+                if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else {
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
                     arguments.add(a);
