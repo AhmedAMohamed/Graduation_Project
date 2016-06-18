@@ -97,7 +97,7 @@ public class DMRGraph {
 			for (String argType : frame.arguments.keySet()) {
 				ArrayList<ArgumentBuilder> argObjects = frame.arguments.get(argType);
 				for (ArgumentBuilder arg : argObjects) {
-					score += (double)ACTIONSCORE.get(argType) * arg.score;
+					score += 1.5 * arg.score;
 				}
 			}
 			frame.score = score;
@@ -110,7 +110,7 @@ public class DMRGraph {
 			double score = 0;
 			for(String argType : argObject.relatedFrames.keySet()) {
 				ArrayList<String> frames = argObject.relatedFrames.get(argType);
-				score += (double)ARGSCORES.get(argType) * frames.size();
+				score += 0.5 * frames.size();
 			}
 			argObject.score = score;
 		}

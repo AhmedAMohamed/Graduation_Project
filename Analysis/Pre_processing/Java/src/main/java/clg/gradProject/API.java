@@ -81,7 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("John gives Samantha a ball . He eats an apple . He drinks tea . She plays football .");
+        genTree("John gives Samantha a ball . She eats an apple . He drinks tea . She plays football .");
 
         for (int i=0;i<10;i++) {
             UUID uuid = UUID.randomUUID();

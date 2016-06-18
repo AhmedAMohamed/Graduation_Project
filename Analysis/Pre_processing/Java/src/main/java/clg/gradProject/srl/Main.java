@@ -75,17 +75,17 @@ public class Main {
             }
             if (isArgument) {
                 if(w.partOfSpeech.startsWith("V")) {
-                    String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.nodeString();
+                   /* String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.value();
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
                     arguments.add(a);
-
-                } else if(!w.partOfSpeech.startsWith("N")) {
+*/
+                }/* else if(!w.partOfSpeech.startsWith("N")) {
                     Node n = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), w.wordNumber);
-                    String val = n.parseTreeNode.parent().nodeString();
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val, w.argument, w.argument[argNumber]);
+                    Node val = SEPTBuilder.getNodeParent(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), n);
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val.parseTreeNode.value(), w.argument, w.argument[argNumber]);
                     arguments.add(a);
-                }
-                if(w.argument[argNumber].contains("AM-MOD")) continue;
+                }*/
+                //if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else {
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
                     arguments.add(a);
@@ -118,6 +118,7 @@ public class Main {
                         word.word = node.ref.parseTreeNode.value();
 
                     }
+
                     word.ws = node.wordSense;
                 }
             }

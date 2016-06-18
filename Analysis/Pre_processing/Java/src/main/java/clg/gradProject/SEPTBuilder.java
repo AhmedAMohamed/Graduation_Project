@@ -1,6 +1,7 @@
 package clg.gradProject;
 
 import edu.stanford.nlp.trees.Tree;
+import is2.transitionR6j.Tagger2;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -111,5 +112,14 @@ public class SEPTBuilder {
 			node.wordSense = wordSense.get(word);
 		}
 	}
-	
+
+	public static Node getNodeParent(Node root, Node node) {
+		for(Node n : root.children) {
+			if(n.equals(node)) {
+				return n;
+			}
+			return getNodeParent(n, node);
+		}
+		return null;
+	}
 }
