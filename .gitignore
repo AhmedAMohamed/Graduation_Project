@@ -14,3 +14,4 @@
 *.bat
 gradlew
 *.lock
+*.DS_Store
