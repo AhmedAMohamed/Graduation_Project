@@ -87,7 +87,7 @@ public double validity(){
     for(int i=0;i<this.K;i++){
     double c=Centroids.get(i);
     ArrayList<FrameBuilder> cluster=Clusters.get(i);
-        for(int j=i;j<K;j++){
+        for(int j=i+1;j<K;j++){
             interDistances.add(pow(c-Centroids.get(j),2));
 
         }
@@ -98,10 +98,11 @@ public double validity(){
         avg=avg/cluster.size();
         intraDistances.add(avg);
     }
-    //get minimum of  intra-distances
-    intra=(Double)Collections.min(intraDistances);
-    //get max of inter distances
-    inter=(Double) Collections.max(interDistances);
+    //get maximum of  intra-distances
+    intra=(Double)Collections.max(intraDistances);
+    //get min of inter distances
+    inter=(Double) Collections.min(interDistances);
+    //smaller value of validity is better
     validity=intra/inter;
     return validity;
 
