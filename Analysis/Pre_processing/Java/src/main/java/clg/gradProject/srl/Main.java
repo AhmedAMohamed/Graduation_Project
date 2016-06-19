@@ -82,17 +82,23 @@ public class Main {
             }
             if (isArgument) {
                 if (w.partOfSpeech.startsWith("V")) {
-                   /* String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.value();
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
+                    //String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.value();
+                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
+                    //arguments.add(a);
+                    continue;
+                }else if(!w.partOfSpeech.startsWith("N")) {
+                    //Node n = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), w.wordNumber);
+                    //Node val = SEPTBuilder.getNodeParent(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), n);
+                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val.parseTreeNode.value(), w.argument, w.argument[argNumber]);
+                    //arguments.add(a);
+                    Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
+                    Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
+                    Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
+                    requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.value(), requestedNode.parseTreeNode.nodeString(), w.argument, w.argument[argNumber]);
                     arguments.add(a);
-*/
-                }/* else if(!w.partOfSpeech.startsWith("N")) {
-                    Node n = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), w.wordNumber);
-                    Node val = SEPTBuilder.getNodeParent(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), n);
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val.parseTreeNode.value(), w.argument, w.argument[argNumber]);
-                    arguments.add(a);
-                }*/
-                //if(w.argument[argNumber].contains("AM-MOD")) continue;
+                }
+                else if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else {
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
                     arguments.add(a);

@@ -114,11 +114,46 @@ public class SEPTBuilder {
 	}
 
 	public static Node getNodeParent(Node root, Node node) {
-		for(Node n : root.children) {
-			if(n.equals(node)) {
-				return n;
+
+		for(int i  = 0; i < root.children.length; i++) {
+			Node n = root.children[i];
+			try {
+				if(n.children[0].equals(node)) {
+					return n;
+				}
+				else {
+					Node e = getNodeParent(n, node);
+					if(e != null) {
+						return e;
+					}
+				}
 			}
-			return getNodeParent(n, node);
+			catch (Exception e) {
+
+			}
+		}
+		return null;
+	}
+
+	public static Node getNodeParent(Node root, Node node, boolean check) {
+		for(int i  = 0; i < root.children.length; i++) {
+			Node n = root.children[i];
+			try {
+				for(int j = 0; j < n.children.length; j++) {
+					if(n.children[j].equals(node)) {
+						return n;
+					}
+					else {
+						Node e = getNodeParent(n, node, true);
+						if(e != null) {
+							return e;
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+
+			}
 		}
 		return null;
 	}
