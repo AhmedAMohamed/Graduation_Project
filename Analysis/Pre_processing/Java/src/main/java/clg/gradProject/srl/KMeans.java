@@ -6,6 +6,7 @@ import clg.gradProject.FrameBuilder;
 import java.util.*;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
 /**
@@ -76,21 +77,34 @@ public class KMeans {
         }
         return sum / list.size();
     }
-/*public float validity(){
-    float validity;
-    float intra=0;
-    double inter=0;
+public double validity(){
+    double validity;
+    double intra=0;
+    double avg=0;
+    double inter;
+    ArrayList intraDistances=new ArrayList();
+    ArrayList interDistances=new ArrayList();
     for(int i=0;i<this.K;i++){
-    float c=Centroids.get(i);
-    ArrayList<ArgumentBuilder> cluster=Clusters.get(i);
-    for(float centroid:Centroids){
-        inter=Math.pow(abs(c-centroid),2);
-    }
-        inter=inter/this.K;
-    }
+    double c=Centroids.get(i);
+    ArrayList<FrameBuilder> cluster=Clusters.get(i);
+        for(int j=i;j<K;j++){
+            interDistances.add(pow(c-Centroids.get(j),2));
 
+        }
+        for(FrameBuilder action:cluster ){
+
+        avg+=pow(action.score-c,2);
+        }
+        avg=avg/cluster.size();
+        intraDistances.add(avg);
+    }
+    //get minimum of  intra-distances
+    intra=(Double)Collections.min(intraDistances);
+    //get max of inter distances
+    inter=(Double) Collections.max(interDistances);
+    validity=intra/inter;
     return validity;
 
-}*/
+}
     }
 
