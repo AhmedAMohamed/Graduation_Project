@@ -136,8 +136,9 @@ public class Main {
                     System.out.println("ENHANCE: " + word);
                     Node node = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(word.sentenceNumber), word.wordNumber);
                     if (node.ref != null) {
-                        word.word = node.ref.parseTreeNode.value();
-
+                        //word.word = node.ref.parseTreeNode.value();
+                        ArgumentBuilder correctArg = findArgument(node.ref.parseTreeNode.value());
+                        args.set(j, correctArg);
                     }
 
                     word.ws = node.wordSense;
@@ -146,20 +147,44 @@ public class Main {
         }
     }
 
+    private static ArgumentBuilder findArgument(String corefValue) {
+        for (FrameBuilder frame : frames) {
+            for (String argType : frame.arguments.keySet()) {
+                ArrayList<ArgumentBuilder> args = frame.arguments.get(argType);
+                for (ArgumentBuilder arg : args) {
+                    if(arg.word.equalsIgnoreCase(corefValue)) {
+                        return arg;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
         buildDMRStepOne(input);
         enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
         singleLevelGraph.createGraph();
-        singleLevelGraph.setScores();
+        singleLevelGraph.setScores(singleLevelGraph.ActionFrames);
 
         KMeans clusters = new KMeans(singleLevelGraph, 2);
 
         double tt = clusters.validity();
         System.out.println(tt);
         DMRGraph multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
+        calculateMultiLevelScore(multiLevelGraph);
+
         System.out.println(multiLevelGraph.ArgsHash.size());
         System.out.println(clusters.Clusters.size());
-        return singleLevelGraph;
+        return multiLevelGraph;
+    }
+
+    private static void calculateMultiLevelScore(DMRGraph multiLevelGraph) {
+        for (FrameBuilder frame : multiLevelGraph.ActionFrames) {
+            if(frame.nextLevel != null) {
+                multiLevelGraph.setScores(frame.nextLevel);
+            }
+        }
     }
 }

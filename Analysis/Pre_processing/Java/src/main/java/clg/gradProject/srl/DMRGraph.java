@@ -86,13 +86,13 @@ public class DMRGraph {
 		}
 	}
 
-	public void setScores() {
+	public void setScores(ArrayList<FrameBuilder> frames) {
 		setArgScores();
-		setActionScores();
+		setActionScores(frames);
 	}
 
-	private void setActionScores() {
-		for (FrameBuilder frame : ActionFrames) {
+	private void setActionScores(ArrayList<FrameBuilder> frames) {
+		for (FrameBuilder frame : frames) {
 			double score = 0;
 			for (String argType : frame.arguments.keySet()) {
 				ArrayList<ArgumentBuilder> argObjects = frame.arguments.get(argType);
@@ -110,7 +110,7 @@ public class DMRGraph {
 			double score = 0;
 			for(String argType : argObject.relatedFrames.keySet()) {
 				ArrayList<String> frames = argObject.relatedFrames.get(argType);
-				score += 0.5 * frames.size();
+				score += 5 * frames.size();
 			}
 			argObject.score = score;
 		}
