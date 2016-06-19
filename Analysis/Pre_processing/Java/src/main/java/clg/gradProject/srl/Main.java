@@ -95,7 +95,7 @@ public class Main {
                     Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
                     Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
                     requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.value(), requestedNode.parseTreeNode.nodeString(), w.argument, w.argument[argNumber]);
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), requestedNode.parseTreeNode.pennString(), w.argument, w.argument[argNumber]);
                     arguments.add(a);
                 }
                 else if(w.argument[argNumber].contains("AM-MOD")) continue;
