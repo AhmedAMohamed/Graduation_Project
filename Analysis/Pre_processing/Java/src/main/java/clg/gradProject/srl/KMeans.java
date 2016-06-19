@@ -85,26 +85,26 @@ public double validity(){
     ArrayList intraDistances=new ArrayList();
     ArrayList interDistances=new ArrayList();
     for(int i=0;i<this.K;i++){
-    double c=Centroids.get(i);
-    ArrayList<FrameBuilder> cluster=Clusters.get(i);
-        for(int j=i;j<K;j++){
-            interDistances.add(pow(c-Centroids.get(j),2));
+        double c=Centroids.get(i);
+        ArrayList<FrameBuilder> cluster=Clusters.get(i);
+            for(int j=i+1;j<K;j++){
+                interDistances.add(pow(c-Centroids.get(j),2));
 
+            }
+            for(FrameBuilder action:cluster ){
+                avg+=pow(action.score-c,2);
+            }
+            avg=avg/cluster.size();
+            intraDistances.add(avg);
         }
-        for(FrameBuilder action:cluster ){
+        //get minimum of  intra-distances
+        intra=(Double)Collections.max(intraDistances);
+        //get max of inter distances
+        inter=(Double) Collections.min(interDistances);
 
-        avg+=pow(action.score-c,2);
-        }
-        avg=avg/cluster.size();
-        intraDistances.add(avg);
+        validity=intra/inter;
+        return validity;
+
     }
-    //get minimum of  intra-distances
-    intra=(Double)Collections.min(intraDistances);
-    //get max of inter distances
-    inter=(Double) Collections.max(interDistances);
-    validity=intra/inter;
-    return validity;
-
 }
-    }
 

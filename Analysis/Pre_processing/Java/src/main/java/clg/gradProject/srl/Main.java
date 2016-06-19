@@ -153,8 +153,10 @@ public class Main {
         singleLevelGraph.createGraph();
         singleLevelGraph.setScores();
 
-        KMeans clusters = new KMeans(singleLevelGraph, 3);
+        KMeans clusters = new KMeans(singleLevelGraph, 2);
 
+        double tt = clusters.validity();
+        System.out.println(tt);
         DMRGraph multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
         System.out.println(multiLevelGraph.ArgsHash.size());
         System.out.println(clusters.Clusters.size());
