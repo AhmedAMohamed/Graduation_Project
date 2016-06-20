@@ -100,8 +100,16 @@ public class Main {
                 }
                 else if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else {
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
+
+                    Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
+                    Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
+                    Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
+                    requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), requestedNode.parseTreeNode.pennString(), w.argument, w.argument[argNumber]);
                     arguments.add(a);
+
+                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
+                    //arguments.add(a);
                 }
 
             }
