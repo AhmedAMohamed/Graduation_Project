@@ -12,16 +12,35 @@
 				stroke-width: 15px;
 			}
 
+			.linkPassive {
+			    stroke: #6DA69E;
+			  	stroke-opacity: .9;
+				fill: none;
+				stroke: url(#line-gradient);
+				stroke-width: 10px;
+				stroke-dasharray: 2, 4;
+			}
+			.linkPath {
+			    stroke: #6DA69E;
+			  	stroke-opacity: .9;
+				fill: none;
+				stroke: url(#line-gradient);
+				stroke-width: 10px;
+				stroke-dasharray: 2, 4;
+			}
 		</style>
 	</head>
 
 	<body>
 		<script type="text/javascript" src="d3/d3.v3.js"></script>
 		<script type="text/javascript" src="d3/d3-plugins-master/fisheye/fisheye.js"></script>
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="d3/d3cssfile.css">
+		<script type="text/javascript" src="js/functions.js"></script>
+		<script type="text/javascript" src="js/nodeAnimations.js"></script>
 		<script type="text/javascript">
-			var w = 1300;
-			var h = 700;
+			var w = $(document).width();
+			var h = $(document).height();
 			var root;
 			var nodes;
 			var maxNodeSize = 50;
@@ -43,7 +62,12 @@
 
 			var link = svg.selectAll(".link"),
 			    node = svg.selectAll(".node");
+			var linkPath;
 
+			var diagonal = d3.svg.diagonal()
+			        .projection(function(d) {
+			            return [d.y, d.x];
+			        });
 
 			svg.append("linearGradient")
 					.attr("id", "line-gradient")
@@ -59,7 +83,7 @@
 					.attr("stop-color", function(d) { return d.color; });
 
 
-			d3.json("output-temp-simple.json", function(error, json) {
+			d3.json("apples.json", function(error, json) {
 				root = json;
 				root.fixed = true;
 				root.x = w/2;
@@ -84,7 +108,6 @@
 					 .links(links)
 					 .linkDistance(function(d, i){
 
-					 	console.log("linkDistance: " + "d: " + JSON.stringify(d,null,4) + ", i: " + i);
 						var min_d = 80, max_d = 150, min_i = 0, max_i = 9, t = d.source.children.length; 
 					 	return min_d + ( t / max_i) * (max_d - min_d);
 					 })
@@ -96,7 +119,9 @@
 	   			link.exit().remove();
 
 	   			link.enter().insert("path", ".node")
-      						.attr("class", "link");	
+      						.attr("class", function(d){
+      							return d.target.is_passive ? "linkPassive" : "link";
+      						});	
 
 				node = node.data(nodes, function(d){ return d.id;});
 				node.exit().remove();
@@ -105,13 +130,8 @@
 			  	var nodeEnter = node.enter().append("g")
 							      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
 							      .on("click", click)
-							      .on("mousemove", function(){
-							      	d3.select(this).select("circle").style("stroke-width", "5px")
-							        d3.select(this).select("circle").style("fill", "#6DA69E")
-							        d3.select(this).select("text").style("fill", "#264F5C")})
-							       .on("mouseout", function(){
-							      	d3.select(this).select("circle").style("fill", "#264F5C")
-									d3.select(this).select("text").style("fill", "#ffffff")})
+							      .on("mousemove", mousemoveNodes)
+							      .on("mouseout", mouseoutNodes)
 							      .call(force.drag);
 
 				// Append a circle
@@ -120,8 +140,7 @@
 					      .attr("class", "shape")
 					      .style("fill", function(d){
 					      	return d.root1? "":"#264F5C";
-					      })
-					      .style("stroke-width", 1.5);
+					      });
 				
 		   		nodeEnter.append("svg:image")
 								      .attr("xlink:href", function(d){
@@ -160,19 +179,31 @@
 
 			    //var leafRadius = 25;
 			    //leafRadius = wrap(d3.selectAll('text'), 100);
-			    //console.log("leafRadius: " + leafRadius);
 
 			    nodeEnter.select(".shape")
 			    			.attr("r", function(d){
 			    				var radius = wrapNode(this.parentNode.childNodes[1], 80) / 2;
 			    				d.radius = radius;
-			    				console.log('radius: ' + JSON.stringify(d.children, null, 4));
-			    				return d.root1? 0: (radius + 5);
+			    				return d.root1? 0: (radius + 5); //circle radius padding
 			    			});
+
+		      	var pathsDataset = buildPathsDatasetFromJson();
+
+	            pathsDataset.paths.forEach(function(e){
+	            	console.log("getNodeByOurId: " + JSON.stringify(getNodeByOurId(e.source), null, 4));
+	            	e.source = getNodeByOurId(e.source);
+	            	e.target = getNodeByOurId(e.target);
+	            });
+			    			
+			    linkPath = svg.selectAll("path.linkPath").data(pathsDataset.paths);
+			    linkPath.exit().remove();
+				linkPath.enter()
+				   .insert("path", ".node")
+				   .attr("class", "linkPath")
+				   .attr("d", diagonal);
 
 			    var fisheye = d3.fisheye.circular()
 							      .radius(50);
-
 
 				svg.on("mousemove", function() {
 				      fisheye.focus(d3.mouse(this));
@@ -193,7 +224,7 @@
 						            + d.target.fisheye.x + "," 
 						            + d.target.fisheye.y;
 						});   
-				    }); 
+				}); 
 			}
 
 			function tick() {
@@ -210,119 +241,47 @@
 			            + d.target.y;
 			  	});
 			    
-			    console.log("LENGTH" + nodes.length);
+			    linkPath.attr("d", function(d) {
+			  		if(d.source && d.target){
+			  			var dx = d.target.x - d.source.x,
+					           dy = d.target.y - d.source.y,
+					           dr = Math.sqrt(dx * dx + dy * dy);
+					           return   "M" + d.source.x + "," 
+					            + d.source.y 
+					            + "A" + dr + "," 
+					            + dr + " 0 0,1 " 
+					            + d.target.x + "," 
+					            + d.target.y;
+					}
+			  	});
+
 			    node.each(collide(0.8));
 				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 			}
 
-			function calculateLeafRadius(maxTextWidth, lineNumber){
-				return maxTextWidth > (lineNumber * 30) ? maxTextWidth : (lineNumber * 30);
-			}
-
-			function wrapNode(thisText, width) {
-			        var text = d3.select(thisText),
-					words = text.text().split(/\s+/).reverse(),
-			          word,
-			          line = [],
-			          lineHeight = 1.1, // ems
-			          y = text.attr("y"),
-			          dy = parseFloat(text.attr("dy")),
-			          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-			          //console.log("shape text: " + JSON.stringify(text, null, 4)),
-			          lineNumber = 0,
-			          maxTextWidth = 0;
-			        while (word = words.pop()) {
-			          line.push(word);
-			          tspan.text(line.join(" "));
-			          if (tspan.node().getComputedTextLength() > width) {
-
-			            line.pop();
-			            tspan.text(line.join(" "));
-
-			          	maxTextWidth = tspan.node().getComputedTextLength() > maxTextWidth ?
-			          			 tspan.node().getComputedTextLength() : maxTextWidth;
-
-			            line = [word];
-			            tspan = text.append("tspan").attr("x", 0).attr("y", y)
-			            		.attr("dy", 15) //height
-			            		.text(word);
-
-			            lineNumber++;
-			          }
-			        }
-			        	maxTextWidth = tspan.node().getComputedTextLength() > maxTextWidth ?
-			          			 tspan.node().getComputedTextLength() : maxTextWidth;
-			        
-			        //d3.select(thisText.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
-			        console.log("____");
-			        console.log("maxTextWidth: " + maxTextWidth);
-			        console.log("lineNumber: " + lineNumber);
-			        console.log("text: " + text.text());
-			        return calculateLeafRadius(maxTextWidth, lineNumber);
-			}
-			function wrap(text, width) {
-				var maxTextWidth = 10;
-			      text.each(function() {
-			        wrapNode(this, width);
-      		});
-			      return 25;
-  			}
-			
 			function click(d) {
 				if (d3.event.defaultPrevented) return;
 				if (d.children) {
+
+					if(d3.select(this)[0][0].__data__.children.length > 0){
+						d3.select(this).select("circle")
+							.style("stroke", "#6DA69E")
+							.style("stroke-width", 5);
+					}
+
 					d._children = d.children;
 					d.children = null;
+
 				} else {
 					d.children = d._children;
 					d._children = null;
+
+					d3.select(this).select("circle")
+							.style("stroke-width", 0);
 				}
 				update();
 			}
 
-			function flatten(root) {
-				  var nodes = []; 
-				  var i = 0;
-				 
-				  function recurse(node) {
-				    if (node.children) 
-				      node.children.forEach(recurse);
-				    if (!node.id) 
-				      node.id = ++i;
-				    nodes.push(node);
-				  }
-				 
-				  recurse(root);
-				  return nodes;
-			}
-
-
-			function collide(alpha) {
-			  var quadtree = d3.geom.quadtree(nodes);
-			  return function(d) {
-
-			    var rb = 2*d.radius + padding,
-			        nx1 = d.x - rb,
-			        nx2 = d.x + rb,
-			        ny1 = d.y - rb,
-			        ny2 = d.y + rb;
-			    quadtree.visit(function(quad, x1, y1, x2, y2) {
-			      if (quad.point && (quad.point !== d)) {
-			        var x = d.x - quad.point.x,
-			            y = d.y - quad.point.y,
-			            l = Math.sqrt(x * x + y * y);
-			          if (l < rb) {
-			          l = (l - rb) / l * alpha;
-			          d.x -= x *= l;
-			          d.y -= y *= l;
-			          quad.point.x += x;
-			          quad.point.y += y;
-			        }
-			      }
-			      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-			    });
-			  };
-			}
 		</script>
 	</body>
 </html>
