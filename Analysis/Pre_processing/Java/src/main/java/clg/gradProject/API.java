@@ -81,7 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("Shakespeare and John had 3 children .");
+        genTree("Shakespeare and John wrote 3 plays .");
         for (int i=0;i<10;i++) {
             UUID uuid = UUID.randomUUID();
             System.out.println(uuid.toString());

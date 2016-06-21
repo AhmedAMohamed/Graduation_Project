@@ -105,11 +105,19 @@ public class Main {
                     Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
                     Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
                     requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), requestedNode.parseTreeNode.pennString(), w.argument, w.argument[argNumber]);
-                    arguments.add(a);
+                    String value = requestedNode.parseTreeNode.pennString();
+                    if (value.contains("(CC and)")) {
+                        String[] values = value.split("(CC and)");
+                        ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values[0], w.argument, w.argument[argNumber]);
+                        arguments.add(a);
 
-                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, w.word, w.argument, w.argument[argNumber]);
-                    //arguments.add(a);
+                        ArgumentBuilder a2 = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values[1], w.argument, w.argument[argNumber]);
+                        arguments.add(a2);
+                    }
+                    else {
+                        ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, w.partOfSpeech, value, w.argument, w.argument[argNumber]);
+                        arguments.add(a);
+                    }
                 }
 
             }
