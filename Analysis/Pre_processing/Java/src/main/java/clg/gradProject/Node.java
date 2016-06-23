@@ -8,8 +8,8 @@ public class Node {
 
 	public Tree parseTreeNode; // this is the parse tree node
 
-	int sentIndex;
-	int wordIndex;
+	public int sentIndex;
+	public int wordIndex;
 	public Node ref;
 	public String wordSense;
 

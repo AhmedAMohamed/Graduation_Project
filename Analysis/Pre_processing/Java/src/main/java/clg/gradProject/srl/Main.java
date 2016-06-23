@@ -182,6 +182,7 @@ public class Main {
         enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
         singleLevelGraph.createGraph();
+        singleLevelGraph.addLinkingActionFrames(2);
         singleLevelGraph.setScores(singleLevelGraph.ActionFrames);
 
         KMeans clusters = new KMeans(singleLevelGraph, 2);

@@ -34,6 +34,9 @@ public class SEPTBuilder {
 	 * @param index sentence index
 	 * recursive generates a full tree
 	 */
+
+	private static boolean after = false;
+
 	public static void treeBuilder(Node node, int index) {
 		for (int i = 0; i < node.children.length; i++) {
 			node.children[i] = new Node(node.parseTreeNode.children()[i], index);
@@ -157,4 +160,65 @@ public class SEPTBuilder {
 		}
 		return null;
 	}
+
+	public static Node findNodeByPOS(Node node, String POS, int state, int sentNumber) {
+		if (state == 1) {
+			if (node.parseTreeNode.value().contains(POS)) {
+				return node;
+			}
+			else {
+				for (int i = 0; i < node.children.length; i++) {
+					Node n = findNodeByPOS(node.children[i], POS, state, sentNumber);
+					if(n != null) {
+						return n;
+					}
+				}
+			}
+		}
+		else if (state == 0) {
+			return iterateToNP(node, findNodeByPOS(node, "VB", 1, node.sentIndex), true);
+		}
+		else if (state == 2) {
+			return iterateToNP(node, findNodeByPOS(node, "VB", 1, node.sentIndex), false);
+		}
+		return null;
+	}
+
+	private static Node iterateToNP(Node node, Node vb, boolean state) {
+		if (state) { // before
+			boolean before = true;
+			if (node.parseTreeNode.value().contains("VP")) {
+				before = false;
+			}
+			if (node.parseTreeNode.value().contains("NP") && before) {
+				return node;
+			}
+			else {
+				for (int i = 0; i < node.children.length; i++) {
+					Node n = iterateToNP(node.children[i], vb, state);
+					if (n != null) {
+						return n;
+					}
+				}
+			}
+		}
+		else {
+			if (node.parseTreeNode.value().contains("VP")) {
+				after = true;
+			}
+			if (node.parseTreeNode.value().contains("NP") && after) {
+				return node;
+			}
+			else {
+				for (int i = 0; i < node.children.length; i++) {
+					Node n = iterateToNP(node.children[i], vb, state);
+					if (n != null) {
+						return n;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 }

@@ -2,6 +2,8 @@ package clg.gradProject.srl;
 
 import clg.gradProject.ArgumentBuilder;
 import clg.gradProject.FrameBuilder;
+import clg.gradProject.Node;
+import clg.gradProject.SEPTBuilder;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import java.util.*;
@@ -115,4 +117,62 @@ public class DMRGraph {
 			argObject.score = score;
 		}
 	}
+
+	public void addLinkingActionFrames(int totalSentenceNumber) throws CloneNotSupportedException {
+		ArrayList<Integer> found = new ArrayList();
+		ArrayList<Integer> noFrames = new ArrayList();
+
+		for (FrameBuilder frame: this.ActionFrames) {
+			found.add(frame.sentenceNumber);
+		}
+
+		for (int i = 1; i < totalSentenceNumber; i++) {
+			if (! found.contains(i)) {
+				noFrames.add(i);
+			}
+		}
+
+		for (Integer sentNumber : noFrames) {
+			Node sentRoot = SEPTBuilder.getSentenceByIndex(sentNumber);
+
+			Node verbNode = SEPTBuilder.findNodeByPOS(sentRoot, "VB", 1, sentRoot.sentIndex);
+			FrameBuilder frame = new FrameBuilder(verbNode.parseTreeNode.pennString(), verbNode.sentIndex, verbNode.wordIndex, verbNode.parseTreeNode.value(), verbNode.parseTreeNode.pennString(), 3);
+
+			Node subjectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 0, sentRoot.sentIndex);
+			ArrayList<ArgumentBuilder> a0Args = addCustomeArgs(subjectArgNode, true);
+			frame.arguments.put("A0", a0Args);
+
+			Node objectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 2, sentRoot.sentIndex);
+			ArrayList<ArgumentBuilder> a1Args = addCustomeArgs(objectArgNode, false);
+			frame.arguments.put("A1", a1Args);
+			this.ActionFrames.add(frame);
+		}
+
+	}
+
+	private ArrayList<ArgumentBuilder> addCustomeArgs(Node argNode, boolean type) {
+		String[] types = new String[2];
+		if(type) {
+			types[0] = "A0";
+		}
+		else {
+			types[1] = "A1";
+		}
+		ArrayList<ArgumentBuilder> args  = new ArrayList();
+		String value = argNode.parseTreeNode.pennString();
+		if (value.contains("(CC and)")) {
+			String[] values = value.split("(CC and)");
+			ArgumentBuilder a = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values[0], types, types[0]);
+			args.add(a);
+
+			ArgumentBuilder a2 = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values[1], types, types[0]);
+			args.add(a2);
+		}
+		else {
+			ArgumentBuilder a = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), value, types, types[0]);
+			args.add(a);
+		}
+		return args;
+	}
+
 }
