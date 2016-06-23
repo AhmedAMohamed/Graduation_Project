@@ -12,5 +12,6 @@ urlpatterns = patterns('',
     url(r'^Visjs/$', views.visjs_page, name='visjs'),
     url(r'^Mindmup/$', views.mindmup, name='mindmup'),
     url(r'^query/$', views.query_page, name='query_page'),
+    url(r'^icon/$', views.noun_project_proxy, name='noun_project_proxy'),
     #url(r'^admin/', include(admin.site.urls)),
 )
