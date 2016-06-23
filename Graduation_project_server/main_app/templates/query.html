@@ -54,14 +54,33 @@
 <script type="text/javascript" src="/static/js/nodeAnimations.js"></script>
 <script type="text/javascript" src="/static/js/converter.js"></script>
 <script type="text/javascript">
+
+window.onload = function () {
+	if (!document.getElementById("json")) return;
+	var json_text = document.getElementById("json").innerHTML;
+	json_obj = JSON.parse(json_text);
+	if (!json_obj.success) {
+		json_obj = framesFirst(JSON.parse(json_text.replace('\n', '')));
+		console.log(JSON.stringify(json_obj, null, 4));
+	}
+	root = json_obj;
+	root.fixed = true;
+	root.x = w/2;
+	root.y = h/2;
+
+	update();
+	console.log('Width = ' + w + ', height= ' + h);
+};
+
 var w = $(document).width();
 var h = $(document).height();
 var root;
 var nodes;
 var maxNodeSize = 50;
+var threshold = 6;
 var padding = 2, // separation between circles
 	radius = 12;
-var svg = d3.select("#mynetwork").append("svg")
+var svg = d3.select("body").append("svg")
 			.attr("class", "container")
 	        .attr("width", w + 500)
 	        .attr("height", h + 300);
@@ -84,6 +103,12 @@ var diagonal = d3.svg.diagonal()
             return [d.y, d.x];
         });
 
+svg.append('filter')
+  .attr('id','invert')
+  .append('feColorMatrix')
+  .attr('type','matrix')
+  .attr('values',"-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1  0 0 0 1 0");
+
 svg.append("linearGradient")
 		.attr("id", "line-gradient")
 		.attr("gradientUnits", "objectBoundingBox")
@@ -97,21 +122,6 @@ svg.append("linearGradient")
 		.attr("offset", function(d) { return d.offset; })
 		.attr("stop-color", function(d) { return d.color; });
 
-window.onload = function () {
-	var json_text = document.getElementById("json").innerHTML;
-	console.log(json_text);
-	json_obj = JSON.parse(json_text);
-	if (!json_obj.success)
-		json_obj = framesFirst(JSON.parse(json_text.replace('\n', '')));
-	root = json_obj;
-	root.fixed = true;
-	root.x = w/2;
-	root.y = h/2;
-
-	update();
-	console.log('Width = ' + w + ', height= ' + h);
-};
-
 function update(){
 
 	nodes = flatten(root),
@@ -122,6 +132,7 @@ function update(){
 				if(d.children)
 				maxChildrenNumber = d.children.length > maxChildrenNumber ? d.children.length : maxChildrenNumber;
 			});
+
 
 	force.nodes(nodes)
 		 .links(links)
@@ -155,22 +166,21 @@ function update(){
 
 	// Append a circle
 	nodeEnter.append("svg:circle")
-		      //.attr("r", function(d){return d.root1? 0:25;})
 		      .attr("class", "shape")
 		      .style("fill", function(d){
 		      	return d.root1? "":"#264F5C";
 		      });
-	
+
 		nodeEnter.append("svg:image")
-					      .attr("xlink:href", function(d){
-					      	return d.root1? "/static/center_node_out.png":"";
-					      })
-					      .attr("width", "150px")
-					      .attr("height", "150px")
-					      .attr("align","center")
-					      .attr("class",function(d){ return d.root1? "":"img_remove"})
-					      .attr("x", -150/2)
-					      .attr("y", -150/2);
+		      .attr("xlink:href", function(d){
+		      	return d.root1? "/static/center_node_out.png":"";
+		      })
+		      .attr("width", "150px")
+		      .attr("height", "150px")
+		      .attr("align","center")
+				  .attr("class",function(d){ return d.root1? "":"img_remove";})					      
+				  .attr("x", -150/2)
+		      .attr("y", -150/2);
 
 
 		// png works
@@ -181,29 +191,63 @@ function update(){
 					      .attr("width", "100px")
 					      .attr("height", "100px")
 					      .attr("align","center")
-					      .attr("class",function(d){ return d.root1? "":"img_remove"})
+					      .attr("class",function(d){ return d.root1? "":"img_remove";})					      
 					      .attr("x", -100/2)
 					      .attr("y", -100/2);
+
+	nodeEnter.append("svg:image")
+		      .attr("xlink:href", function(d){
+		      	$.ajax({
+				    url: '/icon?term=' + d.name,
+				    type: 'GET',
+				    dataType: 'json',
+				    success: function(data) {
+				    	console.log(JSON.stringify(data, null, 4));
+				    	d.image = data.icon.preview_url_42;
+		      		},
+				    error: function(data) { 
+				    	console.log('error');
+				    },
+				    async: false
+				});
+				console.log('for name ' + d.name + ': ' + d.image);
+		      	return d.image ? d.image: "";
+		      })
+		      .attr("width", 40)
+			  .attr("height", 40) 
+		      .attr("align","bottom")
+		      .attr("class","icon")	
+	          .attr("x", -50/2)
+			  .attr("y", -20/2)
+			  .style("filter", ("filter","url(#invert)"));
 
 	nodeEnter.selectAll(".img_remove").remove();
 
 	nodeEnter.append("text")
-	          .attr("dy", ".35em")
+	          .attr("dy", function(d){ 
+		      	if (d.image === undefined) {
+		      		return "0.35em"; 
+		      	}else{
+		      		return "-1em";
+		      	}
+		      })
 	          .attr("text-anchor", "middle")
 	          .style("font-size", 12)
-	          .style("fill", function(d){return d.root1? "#ffffff":"#ffffff";});
+	          .style("fill", "#ffffff");
 
     nodeEnter.selectAll("text")
     		 .text(function(d){return d.name;});
 
-    //var leafRadius = 25;
-    //leafRadius = wrap(d3.selectAll('text'), 100);
-
     nodeEnter.select(".shape")
     			.attr("r", function(d){
-    				var radius = wrapNode(this.parentNode.childNodes[1], 80) / 2;
-    				d.radius = radius;
-    				return d.root1? 0: (radius + 5); //circle radius padding
+    				var radius = wrapNode(this.parentNode.childNodes[2], 80) / 2;
+    				if (d.image !== undefined) {
+    					d.radius = radius + 15;
+    					return d.root1? 0: (d.radius); //circle radius padding
+    				}else{
+    					d.radius = radius + 5;
+    					return d.root1? 0: (d.radius);
+    				}
     			});
 
   	var pathsDataset = buildPathsDatasetFromJson();
@@ -229,7 +273,7 @@ function update(){
 
 	      d3.selectAll("circle.shape").each(function(d) { d.fisheye = fisheye(d); })
 	          .attr("r", function(d) { 
-    				return d.root1? 0: (d.fisheye.z  * d.radius + 2);
+    				return d.root1? 0: (d.fisheye.z  * d.radius);
 	          });
 
 	      link.attr("d", function(d) {
@@ -243,7 +287,7 @@ function update(){
 			            + d.target.fisheye.x + "," 
 			            + d.target.fisheye.y;
 			});   
-	}); 
+	});
 }
 
 function tick() {
@@ -300,6 +344,5 @@ function click(d) {
 	}
 	update();
 }
-
 </script>
 {% endblock %}
