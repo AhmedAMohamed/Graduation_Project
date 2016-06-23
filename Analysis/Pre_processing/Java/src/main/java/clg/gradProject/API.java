@@ -82,10 +82,7 @@ public class API {
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
         genTree("Shakespeare was a writer .");
-        for (int i=0;i<10;i++) {
-            UUID uuid = UUID.randomUUID();
-            System.out.println(uuid.toString());
-        }
+
     }
 
     public static void StartRPCClient() throws Throwable, Exception {
@@ -115,8 +112,14 @@ public class API {
 
             String message = new String(delivery.getBody());
 
-            System.out.println(" [.] ParseTree(" + message + ")");
-            String response = "" + genTree(message);
+            System.out.println(" [.] genTree (" + message + ")");
+            String response = null;
+            try {
+                response = "" + genTree(message);
+            } catch (Throwable t) {
+                System.out.println("Error happened: " + t.getStackTrace());
+                response = "{'success': false}";
+            }
 
             channel.basicPublish( "", props.getReplyTo(), replyProps, response.getBytes());
 
@@ -142,6 +145,7 @@ public class API {
     public static String genTree(String message) throws Throwable, Exception {
         Annotation a = API
                 .annotate(message);
+        SEPTBuilder.SEPTs = new ArrayList<Node>();
 
         List<Tree> trees = API.getAllTrees(a);
         List list = API.getAllMentionsSets(a);

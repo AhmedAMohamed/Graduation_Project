@@ -9,17 +9,340 @@
 		<label for="query_textbox" id = "query_label">Type your query here!</label>
 			<input class="form-control" id="query_textbox" placeholder="Enter a query" name="query">
 		</form>
+		<label id="error_label" style="visibility: hidden">Error parsing this sentence</label>
 	</div>
 	{% if json %}
-		<div id="json" style="visibility: hidden"> {{ json }}</div>
-		<div id="mynetwork">
+		<div id="mynetwork"></div>
+		<div id="json" style="display: none"> {{ json }}</div>
 	{% endif %}
 	</div>
 {% endblock %}
 
 {% block JS_INCLUDE %}
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.12.0/vis.min.css" rel="stylesheet" type="text/css" />
+<link rel='stylesheet' type='text/css' href='/static/CSS/style.css'/>
+<style type="text/css">
+	.link {
+	  stroke: #6DA69E;
+	  stroke-opacity: .9;
+		fill: none;
+		stroke: url(#line-gradient);
+		stroke-width: 15px;
+	}
 
-  <script type="text/javascript" src="/static/parsetree/vis_js_hierarchical_layout.js"></script>
+	.linkPassive {
+	    stroke: #6DA69E;
+	  	stroke-opacity: .9;
+		fill: none;
+		stroke: url(#line-gradient);
+		stroke-width: 10px;
+		stroke-dasharray: 2, 4;
+	}
+	.linkPath {
+	    stroke: #6DA69E;
+	  	stroke-opacity: .9;
+		fill: none;
+		stroke: url(#line-gradient);
+		stroke-width: 10px;
+		stroke-dasharray: 2, 4;
+	}
+</style>
+<link rel="stylesheet" type="text/css" href="/static/d3/d3cssfile.css">
+<script type="text/javascript" src="/static/d3/d3.v3.js"></script>
+<script type="text/javascript" src="/static/d3/d3-plugins-master/fisheye/fisheye.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/static/js/functions.js"></script>
+<script type="text/javascript" src="/static/js/nodeAnimations.js"></script>
+<script type="text/javascript" src="/static/js/converter.js"></script>
+<script type="text/javascript">
+
+window.onload = function () {
+	if (!document.getElementById("json")) return;
+	var json_text = document.getElementById("json").innerHTML;
+	json_obj = JSON.parse(json_text);
+	if (!json_obj.success) {
+		json_obj = framesFirst(JSON.parse(json_text.replace('\n', '')));
+		console.log(JSON.stringify(json_obj, null, 4));
+	}
+	root = json_obj;
+	root.fixed = true;
+	root.x = w/2;
+	root.y = h/2;
+
+	update();
+	console.log('Width = ' + w + ', height= ' + h);
+};
+
+var w = $(document).width();
+var h = $(document).height();
+var root;
+var nodes;
+var maxNodeSize = 50;
+var threshold = 6;
+var padding = 2, // separation between circles
+	radius = 12;
+var svg = d3.select("body").append("svg")
+			.attr("class", "container")
+	        .attr("width", w + 500)
+	        .attr("height", h + 300);
+
+var force = d3.layout.force()
+				 .gravity(0.05)
+				 .charge(-2000)
+				 .linkDistance(100)
+					 .friction(0.5)
+					 .linkStrength(1)
+					 .size([w, h])
+					 .on("tick", tick);
+
+var link = svg.selectAll(".link"),
+    node = svg.selectAll(".node");
+var linkPath;
+
+var diagonal = d3.svg.diagonal()
+        .projection(function(d) {
+            return [d.y, d.x];
+        });
+
+svg.append('filter')
+  .attr('id','invert')
+  .append('feColorMatrix')
+  .attr('type','matrix')
+  .attr('values',"-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1  0 0 0 1 0");
+
+svg.append("linearGradient")
+		.attr("id", "line-gradient")
+		.attr("gradientUnits", "objectBoundingBox")
+		.selectAll("stop")
+		.data([
+		{offset: "0%", color: "#6DA69E"},
+		{offset: "80%", color: "#3A656E"},
+		{offset: "100%", color: "#264F5C"}
+		])
+		.enter().append("stop")
+		.attr("offset", function(d) { return d.offset; })
+		.attr("stop-color", function(d) { return d.color; });
+
+function update(){
+
+	nodes = flatten(root),
+	links = d3.layout.tree().links(nodes);
+	
+	var maxChildrenNumber = 0;
+			nodes.forEach(function(d){
+				if(d.children)
+				maxChildrenNumber = d.children.length > maxChildrenNumber ? d.children.length : maxChildrenNumber;
+			});
+
+
+	force.nodes(nodes)
+		 .links(links)
+		 .linkDistance(function(d, i){
+
+			var min_d = 80, max_d = 150, min_i = 0, max_i = 9, t = d.source.children.length; 
+		 	return min_d + ( t / max_i) * (max_d - min_d);
+		 })
+		 .on("tick", tick)
+		 .start();
+		
+		link = link.data(links, function(d){ return d.target.id;});
+		
+		link.exit().remove();
+
+		link.enter().insert("path", ".node")
+					.attr("class", function(d){
+						return d.target.is_passive ? "linkPassive" : "link";
+					});	
+
+	node = node.data(nodes, function(d){ return d.id;});
+	node.exit().remove();
+
+  	// Enter any new nodes.
+  	var nodeEnter = node.enter().append("g")
+				      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
+				      .on("click", click)
+				      .on("mousemove", mousemoveNodes)
+				      .on("mouseout", mouseoutNodes)
+				      .call(force.drag);
+
+	// Append a circle
+	nodeEnter.append("svg:circle")
+		      .attr("class", "shape")
+		      .style("fill", function(d){
+		      	return d.root1? "":"#264F5C";
+		      });
+
+		nodeEnter.append("svg:image")
+		      .attr("xlink:href", function(d){
+		      	return d.root1? "/static/center_node_out.png":"";
+		      })
+		      .attr("width", "150px")
+		      .attr("height", "150px")
+		      .attr("align","center")
+				  .attr("class",function(d){ return d.root1? "":"img_remove";})					      
+				  .attr("x", -150/2)
+		      .attr("y", -150/2);
+
+
+		// png works
+		nodeEnter.append("svg:image")
+					      .attr("xlink:href", function(d){
+					      	return d.root1? "/static/center_node_group.png":"";
+					      })
+					      .attr("width", "100px")
+					      .attr("height", "100px")
+					      .attr("align","center")
+					      .attr("class",function(d){ return d.root1? "":"img_remove";})					      
+					      .attr("x", -100/2)
+					      .attr("y", -100/2);
+
+	nodeEnter.append("svg:image")
+		      .attr("xlink:href", function(d){
+		      	$.ajax({
+				    url: '/icon?term=' + d.name,
+				    type: 'GET',
+				    dataType: 'json',
+				    success: function(data) {
+				    	console.log(JSON.stringify(data, null, 4));
+				    	d.image = data.icon.preview_url_42;
+		      		},
+				    error: function(data) { 
+				    	console.log('error');
+				    },
+				    async: false
+				});
+				console.log('for name ' + d.name + ': ' + d.image);
+		      	return d.image ? d.image: "";
+		      })
+		      .attr("width", 40)
+			  .attr("height", 40) 
+		      .attr("align","bottom")
+		      .attr("class","icon")	
+	          .attr("x", -50/2)
+			  .attr("y", -20/2)
+			  .style("filter", ("filter","url(#invert)"));
+
+	nodeEnter.selectAll(".img_remove").remove();
+
+	nodeEnter.append("text")
+	          .attr("dy", function(d){ 
+		      	if (d.image === undefined) {
+		      		return "0.35em"; 
+		      	}else{
+		      		return "-1em";
+		      	}
+		      })
+	          .attr("text-anchor", "middle")
+	          .style("font-size", 12)
+	          .style("fill", "#ffffff");
+
+    nodeEnter.selectAll("text")
+    		 .text(function(d){return d.name;});
+
+    nodeEnter.select(".shape")
+    			.attr("r", function(d){
+    				var radius = wrapNode(this.parentNode.childNodes[2], 80) / 2;
+    				if (d.image !== undefined) {
+    					d.radius = radius + 15;
+    					return d.root1? 0: (d.radius); //circle radius padding
+    				}else{
+    					d.radius = radius + 5;
+    					return d.root1? 0: (d.radius);
+    				}
+    			});
+
+  	var pathsDataset = buildPathsDatasetFromJson();
+
+    pathsDataset.paths.forEach(function(e){
+    	console.log("getNodeByOurId: " + JSON.stringify(getNodeByOurId(e.source), null, 4));
+    	e.source = getNodeByOurId(e.source);
+    	e.target = getNodeByOurId(e.target);
+    });
+    			
+    linkPath = svg.selectAll("path.linkPath").data(pathsDataset.paths);
+    linkPath.exit().remove();
+	linkPath.enter()
+	   .insert("path", ".node")
+	   .attr("class", "linkPath")
+	   .attr("d", diagonal);
+
+    var fisheye = d3.fisheye.circular()
+				      .radius(50);
+
+	svg.on("mousemove", function() {
+	      fisheye.focus(d3.mouse(this));
+
+	      d3.selectAll("circle.shape").each(function(d) { d.fisheye = fisheye(d); })
+	          .attr("r", function(d) { 
+    				return d.root1? 0: (d.fisheye.z  * d.radius);
+	          });
+
+	      link.attr("d", function(d) {
+			     var dx = d.target.fisheye.x - d.source.fisheye.x,
+			           dy = d.target.fisheye.y - d.source.fisheye.y,
+			           dr = Math.sqrt(dx * dx + dy * dy);
+			           return   "M" + d.source.fisheye.x + "," 
+			            + d.source.fisheye.y 
+			            + "A" + dr + "," 
+			            + dr + " 0 0,1 " 
+			            + d.target.fisheye.x + "," 
+			            + d.target.fisheye.y;
+			});   
+	});
+}
+
+function tick() {
+	link.attr("d", function(d) {
+ 
+     var dx = d.target.x - d.source.x,
+           dy = d.target.y - d.source.y,
+           dr = Math.sqrt(dx * dx + dy * dy);
+           return   "M" + d.source.x + "," 
+            + d.source.y 
+            + "A" + dr + "," 
+            + dr + " 0 0,1 " 
+            + d.target.x + "," 
+            + d.target.y;
+  	});
+    
+    linkPath.attr("d", function(d) {
+  		if(d.source && d.target){
+  			var dx = d.target.x - d.source.x,
+		           dy = d.target.y - d.source.y,
+		           dr = Math.sqrt(dx * dx + dy * dy);
+		           return   "M" + d.source.x + "," 
+		            + d.source.y 
+		            + "A" + dr + "," 
+		            + dr + " 0 0,1 " 
+		            + d.target.x + "," 
+		            + d.target.y;
+		}
+  	});
+
+    node.each(collide(0.8));
+	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+}
+
+function click(d) {
+	if (d3.event.defaultPrevented) return;
+	if (d.children) {
+
+		if(d3.select(this)[0][0].__data__.children.length > 0){
+			d3.select(this).select("circle")
+				.style("stroke", "#6DA69E")
+				.style("stroke-width", 5);
+		}
+
+		d._children = d.children;
+		d.children = null;
+
+	} else {
+		d.children = d._children;
+		d._children = null;
+
+		d3.select(this).select("circle")
+				.style("stroke-width", 0);
+	}
+	update();
+}
+</script>
 {% endblock %}

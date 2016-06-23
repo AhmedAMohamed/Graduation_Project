@@ -178,6 +178,7 @@ public class Main {
     }
 
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
+        frames = new ArrayList<FrameBuilder>();
         buildDMRStepOne(input);
         enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
