@@ -81,7 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("Shakespeare was a writer .");
+        genTree("the college boy who danced. ");
 
     }
 

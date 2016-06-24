@@ -136,16 +136,22 @@ public class DMRGraph {
 			Node sentRoot = SEPTBuilder.getSentenceByIndex(sentNumber);
 
 			Node verbNode = SEPTBuilder.findNodeByPOS(sentRoot, "VB", 1, sentRoot.sentIndex);
-			FrameBuilder frame = new FrameBuilder(verbNode.parseTreeNode.pennString(), verbNode.sentIndex, verbNode.wordIndex, verbNode.parseTreeNode.value(), verbNode.parseTreeNode.pennString(), 3);
+			if (verbNode != null) {
+				FrameBuilder frame = new FrameBuilder(verbNode.parseTreeNode.pennString(), verbNode.sentIndex, verbNode.wordIndex, verbNode.parseTreeNode.value(), verbNode.parseTreeNode.pennString(), 3);
 
-			Node subjectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 0, sentRoot.sentIndex);
-			ArrayList<ArgumentBuilder> a0Args = addCustomeArgs(subjectArgNode, true);
-			frame.arguments.put("A0", a0Args);
+				Node subjectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 0, sentRoot.sentIndex);
+				if (subjectArgNode != null) {
+					ArrayList<ArgumentBuilder> a0Args = addCustomeArgs(subjectArgNode, true);
+					frame.arguments.put("A0", a0Args);
 
-			Node objectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 2, sentRoot.sentIndex);
-			ArrayList<ArgumentBuilder> a1Args = addCustomeArgs(objectArgNode, false);
-			frame.arguments.put("A1", a1Args);
-			this.ActionFrames.add(frame);
+					Node objectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 2, sentRoot.sentIndex);
+					if (objectArgNode != null) {
+						ArrayList<ArgumentBuilder> a1Args = addCustomeArgs(objectArgNode, false);
+						frame.arguments.put("A1", a1Args);
+						this.ActionFrames.add(frame);
+					}
+				}
+			}
 		}
 
 	}

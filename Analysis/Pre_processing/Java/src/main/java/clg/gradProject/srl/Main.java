@@ -31,12 +31,7 @@ public class Main {
         String srl_output = CompletePipeline.parseCoNLL09(completePipelineCMDLineOptions, completePipeline, bufferedReader, null) + "\n";
         System.out.println("SRL output: " + srl_output);
 
-//        String fileName = "out_4.txt";
         String line = null;
-//        FileReader fileReader = new FileReader(fileName);
-//
-//        BufferedReader bufferedReader =
-//                new BufferedReader(fileReader);
         is = new ByteArrayInputStream(srl_output.getBytes());
         bufferedReader = new BufferedReader(new InputStreamReader(is));
 
@@ -82,15 +77,11 @@ public class Main {
             }
             if (isArgument) {
                 if (w.partOfSpeech.startsWith("V")) {
-                    //String val = SEPTBuilder.getSentenceByIndex(w.sentenceNumber).parseTreeNode.value();
-                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "S", val, w.argument, w.argument[argNumber]);
-                    //arguments.add(a);
                     continue;
-                }else if(!w.partOfSpeech.startsWith("N")) {
-                    //Node n = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), w.wordNumber);
-                    //Node val = SEPTBuilder.getNodeParent(SEPTBuilder.getSentenceByIndex(w.sentenceNumber), n);
-                    //ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, 0, "PP", val.parseTreeNode.value(), w.argument, w.argument[argNumber]);
-                    //arguments.add(a);
+                }
+                else if(w.argument[argNumber].contains("AM-MOD")) continue;
+                else if(w.argument[argNumber].contains("R-A0")) continue;
+                else if(!w.partOfSpeech.startsWith("N")) {
                     Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
                     Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
                     Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
@@ -98,7 +89,6 @@ public class Main {
                     ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), requestedNode.parseTreeNode.pennString(), w.argument, w.argument[argNumber]);
                     arguments.add(a);
                 }
-                else if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else {
 
                     Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
@@ -178,12 +168,14 @@ public class Main {
     }
 
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
-        frames = new ArrayList<FrameBuilder>();
+        frames = new ArrayList();
         buildDMRStepOne(input);
         enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
         singleLevelGraph.createGraph();
+
         singleLevelGraph.addLinkingActionFrames(2);
+
         singleLevelGraph.setScores(singleLevelGraph.ActionFrames);
 
         KMeans clusters = new KMeans(singleLevelGraph, 2);
