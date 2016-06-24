@@ -111,8 +111,6 @@ public class Main {
                 }
 
             }
-            System.out.println("Word: " + w + ", predicate: " + (w.isPredicate ? "YES" : "NO") + ", is argument: " +
-                    (isArgument ? "YES" : "NO"));
         }
 
         for (ArgumentBuilder arg : arguments) {
@@ -137,17 +135,15 @@ public class Main {
             for (String key : frames.get(i).arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frames.get(i).arguments.get(key);
                 for (int j = 0; j < args.size(); j++) {
-                    //System.out.println(i);
                     ArgumentBuilder word = args.get(j);
-                    System.out.println("ENHANCE: " + word);
                     Node node = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(word.sentenceNumber), word.wordNumber);
-                    if (node.ref != null) {
-                        //word.word = node.ref.parseTreeNode.value();
-                        ArgumentBuilder correctArg = findArgument(node.ref.parseTreeNode.value());
-                        args.set(j, correctArg);
+                    if (node != null) {
+                        if (node.ref != null) {
+                            ArgumentBuilder correctArg = findArgument(node.ref.parseTreeNode.value());
+                            args.set(j, correctArg);
+                        }
+                        word.ws = node.wordSense;
                     }
-
-                    word.ws = node.wordSense;
                 }
             }
         }
@@ -158,7 +154,7 @@ public class Main {
             for (String argType : frame.arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frame.arguments.get(argType);
                 for (ArgumentBuilder arg : args) {
-                    if(arg.word.equalsIgnoreCase(corefValue)) {
+                    if(arg.word.contains(corefValue)) {
                         return arg;
                     }
                 }

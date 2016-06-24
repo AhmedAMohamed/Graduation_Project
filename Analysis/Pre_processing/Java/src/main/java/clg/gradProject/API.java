@@ -81,7 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("the college boy who danced. ");
+        genTree("Shakespeare was born in 1564 . He had 3 children . He was earning his living from agriculture products . He wrote 38 good plays .");
 
     }
 
@@ -145,7 +145,7 @@ public class API {
     public static String genTree(String message) throws Throwable, Exception {
         Annotation a = API
                 .annotate(message);
-        SEPTBuilder.SEPTs = new ArrayList<Node>();
+        SEPTBuilder.SEPTs = new ArrayList();
 
         List<Tree> trees = API.getAllTrees(a);
         List list = API.getAllMentionsSets(a);
