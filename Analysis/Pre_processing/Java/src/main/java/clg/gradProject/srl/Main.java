@@ -140,7 +140,9 @@ public class Main {
                     if (node != null) {
                         if (node.ref != null) {
                             ArgumentBuilder correctArg = findArgument(node.ref.parseTreeNode.value());
-                            args.set(j, correctArg);
+                            if (correctArg != null) {
+                                args.set(j, correctArg);
+                            }
                         }
                         word.ws = node.wordSense;
                     }
