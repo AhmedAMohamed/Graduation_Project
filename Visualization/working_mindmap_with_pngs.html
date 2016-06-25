@@ -45,9 +45,14 @@
 			var root;
 			var nodes;
 			var maxNodeSize = 50;
-    		var threshold = 6;
-			var padding = 2, // separation between circles
-    			radius = 12;
+			var padding = 8, // separation between circles
+    			radius = 12,
+    			magnifierFactor = 10;
+    			minimizerFactor = 10;
+    		var bBoxDimension;
+    		var nodeEnter;
+    		var iconWidth = 40;
+    		var iconHeight = 40;
 			var svg = d3.select("body").append("svg")
 						.attr("class", "container")
 				        .attr("width", w + 500)
@@ -55,7 +60,7 @@
 
 			var force = d3.layout.force()
 							 .gravity(0.05)
-							 .charge(-2000)
+							 .charge(-3000)
 		    				 .linkDistance(100)
 		   					 .friction(0.5)
 		   					 .linkStrength(1)
@@ -91,7 +96,7 @@
 					.attr("stop-color", function(d) { return d.color; });
 
 
-			d3.json("apples.json", function(error, json) {
+			d3.json("shakespeare.json", function(error, json) {
 				root = json;
 				root.fixed = true;
 				root.x = w/2;
@@ -136,7 +141,7 @@
 				node.exit().remove();
  
 			  	// Enter any new nodes.
-			  	var nodeEnter = node.enter().append("g")
+			  	nodeEnter = node.enter().append("g")
 							      .attr("class", function(d){ return d.root1? "node root":"node leaf"; })
 							      .on("click", click)
 							      .on("mousemove", mousemoveNodes)
@@ -174,52 +179,94 @@
 								      .attr("x", -100/2)
 								      .attr("y", -100/2);
 
-				nodeEnter.append("svg:image")
-					      .attr("xlink:href", function(d){ 
-					      	if (d.image !== undefined) {
-					      		console.log(d.image);
-					      		return d.image; 
-					      	}else{
-					      		return "";
-					      	}
-					      })
-					      .attr("width", 40)
-      					  .attr("height", 40) 
-					      .attr("align","bottom")
-					      .attr("class","icon")	
-				          .attr("x", -50/2)
-						  .attr("y", -20/2)
-						  .style("filter", ("filter","url(#invert)"));
+				var icon = nodeEnter.append("svg:image")
+							      .attr("xlink:href", function(d){ 
+							      	if (d.image !== undefined) {
+							      		console.log(d.image);
+							      		return d.image; 
+							      	}else{
+							      		return "";
+							      	}
+							      })
+							      .attr("align", function(d){
+							      	return d.root1? "center":"";
+							      })
+							      .attr("width", iconWidth)
+		      					  .attr("height", iconHeight) 
+							      .attr("class","icon")
+								  .style("filter", ("filter","url(#invert)"))
+								  .style("display", "block");
 
 				nodeEnter.selectAll(".img_remove").remove();
 
-				nodeEnter.append("text")
-				          .attr("dy", function(d){ 
-					      	if (d.image === undefined) {
-					      		return "0.35em"; 
-					      	}else{
-					      		return "-1em";
-					      	}
-					      })
-				          .attr("text-anchor", "middle")
-				          .style("font-size", 12)
-				          .style("fill", "#ffffff");
+				var textNode = nodeEnter.append("text")
+						          .attr("text-anchor", "middle")
+						          .style("font-size", 12)
+						          .style("fill", "#ffffff");
 
 			    nodeEnter.selectAll("text")
 			    		 .text(function(d){return d.name;});
 
-			    nodeEnter.select(".shape")
-			    			.attr("r", function(d){
-			    				var radius = wrapNode(this.parentNode.childNodes[2], 80) / 2;
-			    				if (d.image !== undefined) {
-			    					d.radius = radius + 15;
-			    					return d.root1? 0: (d.radius); //circle radius padding
-			    				}else{
-			    					d.radius = radius + 5;
-			    					return d.root1? 0: (d.radius);
-			    				}
-			    			});
+				textNode.attr("dy", function(d){
+						  	bBoxDimension = wrapNode(this.parentNode.childNodes[2], 80);
+	    					d.lineNumber = bBoxDimension[1];
+	    					d.bBoxWidth = bBoxDimension[0];
+					      		return "";
+			      			});
 
+			    nodeEnter.select(".shape")
+		    			.attr("r", function(d){
+		    				if (d.image !== undefined) { 
+		    					d.radius = (d.lineNumber * magnifierFactor) + iconHeight;
+		    					return d.root1? 0: d.radius;
+		    				}else{
+		    					if (d.lineNumber > 1) {
+		    						d.radius = (d.lineNumber * magnifierFactor) + padding;
+		    					}else{
+		    						d.radius = d.bBoxWidth/2 + padding;
+		    					}
+		    					return d.root1? 0: d.radius;
+		    				}		
+			    		});
+
+				textNode.select("tspan.first_tspan")
+						.attr("dy", function(d){
+							if (d.image === undefined && d.lineNumber === 0) {
+			      				return d.root1? "": "0.35em"; 
+			      			}else if (d.image !== undefined && d.lineNumber === 0) {
+			      				return d.root1? "":"-1em";
+			      			}else if (d.image !== undefined && d.lineNumber > 0){
+					      		return d.root1? "":"-"+ (d.lineNumber) +"em";
+			      			}else{
+			      				var bbox = this.parentNode.childNodes[2].getBBox();
+			      				var distance = Math.sqrt(Math.pow((Math.abs(bbox.x) - 0), 2) + 
+			      					Math.pow((Math.abs(bbox.y) - 0), 2));
+			      				console.log("Distance: "+distance + " radius" + d.radius);
+			      					if (distance > d.radius) {
+			      						console.log("Distance > Radius");
+			      						return d.root1? "":"-"+ (distance - d.radius) / minimizerFactor  +"em";
+			      					}else{
+			      						return d.root1? "": "-"+ (d.radius - distance) / minimizerFactor  +"em";;
+			      					}
+			      			}
+			      		});
+
+				icon.attr("x", function(d){
+						var bbox = this.parentNode.childNodes[2].getBBox();
+						return bbox.x + bbox.width/2 - iconWidth/2;
+					})
+					.attr("y", function(d){
+						var bbox = this.parentNode.childNodes[2].getBBox();
+							if (!d.root1) {
+								if ((d.lineNumber > 1)) {
+									return bbox.y + 2 * (d.lineNumber * magnifierFactor) + 4;
+								}else{
+									return bbox.y + d.lineNumber * magnifierFactor + padding;
+								}
+							}else{
+								return "";
+							}
+					});					      	
 		      	var pathsDataset = buildPathsDatasetFromJson();
 
 	            pathsDataset.paths.forEach(function(e){
