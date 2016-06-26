@@ -76,6 +76,7 @@ function getJSONFromFrames (original_frames, level) {
       id_counter = 0;
   // Get max score frame
   maximum_frame = get_max_frame(original_frames);
+  console.log('max frame: ' + maximum_frame.word);
   node_obj = {
     name: maximum_frame['word'],
     children: [],
@@ -88,6 +89,9 @@ function getJSONFromFrames (original_frames, level) {
   // Get Arguments
   // TODO: don't return a second level frame
   maximum_argument_word = get_max_argument_word(maximum_frame.arguments);
+  if (maximum_argument_word[0] == '(') {
+    maximum_argument_word = parseParseTree(maximum_argument_word);
+  }
   for (var argument_type in maximum_frame.arguments) {
     var argument_array = maximum_frame.arguments[argument_type];
     for (var i = 0; i <argument_array.length; i++) {
@@ -111,6 +115,7 @@ function getJSONFromFrames (original_frames, level) {
         nodes_dict[argument['word']] = node_obj;
       } else {
         // Highest score argument as root
+        console.log('\t type of maximum word arg: '  + argument_type);
         node_obj = {
           name: argument['word'],
           root1: true,
@@ -120,6 +125,7 @@ function getJSONFromFrames (original_frames, level) {
         };
         id_counter++;
         if (argument_type != 'A0') {
+          console.log('\t not A0 lol');
           nodes_dict[maximum_frame.word].is_passive = true;
         }
         output_json = node_obj;
@@ -128,6 +134,7 @@ function getJSONFromFrames (original_frames, level) {
     }
   }
 
+  console.log('output json: ' + output_json.name);
   // Iterate over frames
   for (var i = 0; i < original_frames.length; i++) {
     var frame = original_frames[i];
@@ -153,6 +160,7 @@ function getJSONFromFrames (original_frames, level) {
         link_word = drawable_array[0];
         link_is_A0 = drawable_array[1];
       }
+      console.log('\tlinkword: ' + link_word);
 
       if (link_word) {
         node_obj = {
@@ -176,8 +184,10 @@ function getJSONFromFrames (original_frames, level) {
             }
             if (argument.argumentType == 'A0') {
               if (argument.word == link_word) {
+                console.log('\t\targument is A0 and link word: ' + argument.word);
                 nodes_dict[link_word].children.push(nodes_dict[frame.word]);
               } else {
+                console.log('\t\targument is A0 and not link word: ' + argument.word);
                 node_obj = {
                   name: argument.word,
                   children: [],
@@ -190,9 +200,11 @@ function getJSONFromFrames (original_frames, level) {
               }
             } else {
               if (argument.word == link_word) {
+                console.log('\t\targument is ' + argument.argumentType +'  and link word: ' + argument.word);
                 nodes_dict[frame.word].is_passive = true;
                 nodes_dict[link_word].children.push(nodes_dict[frame.word]);
               } else {
+                console.log('\t\targument is ' + argument.argumentType +'  and not link word: ' + argument.word);
                 if (nodes_dict[argument.word]) {
                   var paths = nodes_dict[frame.word].paths;
                   if (paths) {

@@ -80,8 +80,8 @@ public class API {
 	}
 
 	public static void main(String[] args) throws Throwable,  Exception{
-        //StartRPCClient();
-        genTree("Shakespeare was born in 1564 . He had 3 children . He was earning his living from agriculture products . He wrote 38 good plays .");
+        StartRPCClient();
+//        genTree("the college boy who danced. ");
 
     }
 

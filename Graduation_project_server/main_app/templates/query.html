@@ -60,7 +60,7 @@ window.onload = function () {
 	var json_text = document.getElementById("json").innerHTML;
 	json_obj = JSON.parse(json_text);
 	if (!json_obj.success) {
-		json_obj = framesFirst(JSON.parse(json_text.replace('\n', '')));
+		json_obj = framesFirst(JSON.parse(json_text));
 		console.log(JSON.stringify(json_obj, null, 4));
 	}
 	root = json_obj;
