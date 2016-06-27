@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+	<head>
+		<link rel='stylesheet' type='text/css' href='css/style.css'/>
+		<style type="text/css">
+			.link, .link2 {
+			  stroke: #6DA69E;
+			  stroke-opacity: .9;
+				fill: none;
+				stroke: url(#line-gradient);
+				stroke-width: 15px;
+			}
+
+			.linkPassive, .linkPath, .linkPath2, .linkPassive2 {
+			    stroke: #6DA69E;
+			  	stroke-opacity: .9;
+				fill: none;
+				stroke: url(#line-gradient);
+				stroke-width: 10px;
+				stroke-dasharray: 2, 4;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript" src="d3/d3.v3.js"></script>
+		<script type="text/javascript" src="d3/d3-plugins-master/fisheye/fisheye.js"></script>
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="d3/d3cssfile.css">
+		<script type="text/javascript" src="js/functions.js"></script>
+		<script type="text/javascript" src="js/nodeAnimations.js"></script>
+		<script type="text/javascript" src="js/MindMap.js"></script>
+		<script type="text/javascript">
+			$(function() {
+			  var myMindMap;
+			  myMindMap = MindMap();
+			  
+			  return d3.json("test-f3.json", function(json) {
+				var w = $(document).width();
+				var h = $(document).height();
+
+			  	root = json;
+				root.fixed = true;
+				root.x = w/2;
+				root.y = h/2;
+
+			    return myMindMap(root);
+			  });
+			});
+		</script>
+
+	</body>
+</html>
