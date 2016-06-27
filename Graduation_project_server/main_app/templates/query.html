@@ -197,22 +197,27 @@ function update(){
 
 	nodeEnter.append("svg:image")
 		      .attr("xlink:href", function(d){
-		      	$.ajax({
-				    url: '/icon?term=' + d.name,
-				    type: 'GET',
-				    dataType: 'json',
-				    success: function(data) {
-				    	console.log(JSON.stringify(data, null, 4));
-				    	d.image = data.icon.preview_url_42;
-		      		},
-				    error: function(data) { 
-				    	console.log('error');
-				    },
-				    async: false
-				});
+		      	if (d.get_image) {
+		      		$.ajax({
+					    url: '/icon?term=' + d.name.trim().split(' ').pop(),
+					    type: 'GET',
+					    dataType: 'json',
+					    success: function(data) {
+					    	console.log(JSON.stringify(data, null, 4));
+					    	d.image = data.icon.preview_url_42;
+			      		},
+					    error: function(data) { 
+					    	console.log('error');
+					    },
+					    async: false
+					});
 
-				console.log('root: ' + JSON.stringify(root, null, 4));
-		      	return d.image ? d.image: "";
+					console.log('root: ' + JSON.stringify(root, null, 4));
+			      	return d.image ? d.image: "";
+		      	} else {
+		      		return "";
+		      	}
+		      	
 		      })
 		      .attr("width", 40)
 			  .attr("height", 40) 

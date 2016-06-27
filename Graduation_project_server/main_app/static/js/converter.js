@@ -1,3 +1,14 @@
+function calculateAverageScoreOfArguments(arguments) {
+  var counter = 0,
+      total = [];
+  for (argument in arguments) {
+    counter++;
+    total.push(arguments[argument].score);
+  }
+  total = total.sort();
+  return total[Math.ceil(total.length / 2)];
+}
+
 function get_max_frame(frames) {
   var max_frame,
       max = -Infinity;
@@ -70,7 +81,7 @@ function isFrameDrawable(frame, nodes) {
   return null;
 }
 
-function getJSONFromFrames (original_frames, level, id_counter) {
+function getJSONFromFrames (original_frames, level, id_counter, score_average) {
   var maximum_frame,
       output_json = {},
       node_obj,
@@ -78,7 +89,6 @@ function getJSONFromFrames (original_frames, level, id_counter) {
       maximum_argument_word;
   // Get max score frame
   maximum_frame = get_max_frame(original_frames);
-  console.log('max frame: ' + maximum_frame.word);
   if (maximum_frame.word[0] == '(') {
     maximum_frame.word = parseParseTree(maximum_frame.word);
   }
@@ -102,10 +112,9 @@ function getJSONFromFrames (original_frames, level, id_counter) {
     for (var i = 0; i <argument_array.length; i++) {
       var argument = argument_array[i];
 
-      if (argument['word'][0] == '(') {
-        argument['word'] = parseParseTree(argument['word']);
+      if (argument.word[0] == '(') {
+        argument.word = parseParseTree(argument.word);
       }
-
       console.log('arg word: ' + argument.word);
       if (argument['word'] != maximum_argument_word) {
         node_obj = {
@@ -114,6 +123,9 @@ function getJSONFromFrames (original_frames, level, id_counter) {
           is_passive: false,
           our_id: id_counter.now
         };
+        if (argument.score >= score_average) {
+          node_obj.get_image = true;
+        }
         id_counter.now++;
         if (argument_type != 'A0') {
           node_obj.is_passive = true;
@@ -130,6 +142,9 @@ function getJSONFromFrames (original_frames, level, id_counter) {
           our_id: id_counter.now
         };
         id_counter.now++;
+        if (argument.score >= score_average) {
+          node_obj.get_image = true;
+        }
         if (argument_type != 'A0') {
           nodes_dict[maximum_frame.word].is_passive = true;
         }
@@ -168,8 +183,10 @@ function getJSONFromFrames (original_frames, level, id_counter) {
         if (drawable_array) {
           link_word = drawable_array[0];
           link_is_A0 = drawable_array[1];
+        } else {
+          link_word = null;
         }
-        console.log('\tlinkword: ' + link_word + 'where dict = ' + JSON.stringify(frame, null, 4));
+        console.log('\tlinkword: ' + link_word);
 
         if (link_word) {
           if (frame.word[0] == '(') {
@@ -207,6 +224,9 @@ function getJSONFromFrames (original_frames, level, id_counter) {
                     is_passive: false,
                     our_id: id_counter.now
                   };
+                  if (argument.score >= score_average) {
+                    node_obj.get_image = true;
+                  }
                   id_counter.now++;
                   nodes_dict[frame.word].children.push(node_obj);
                   nodes_dict[argument.word] = node_obj;
@@ -232,6 +252,9 @@ function getJSONFromFrames (original_frames, level, id_counter) {
                       is_passive: true,
                       our_id: id_counter.now
                     };
+                    if (argument.score >= score_average) {
+                      node_obj.get_image = true;
+                    }
                     id_counter.now++;
                     nodes_dict[frame.word].children.push(node_obj);
                     nodes_dict[argument.word] = node_obj;
@@ -248,5 +271,7 @@ function getJSONFromFrames (original_frames, level, id_counter) {
 }
 
 function framesFirst(orginial_json) {
-  return getJSONFromFrames(orginial_json.frames, 1, {now: 0});
+  var average_score = calculateAverageScoreOfArguments(orginial_json.args);
+  console.log('score average: ' + average_score);
+  return getJSONFromFrames(orginial_json.frames, 1, {now: 0}, average_score);
 };
