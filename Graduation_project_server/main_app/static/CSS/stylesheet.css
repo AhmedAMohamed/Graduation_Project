@@ -1,17 +1,17 @@
 @font-face{
     font-family: Fake Reciept;
     src:url(fonts/appnamefont.ttf);
-    font-size:large;
+    font-size: 12px;
 }
 
 @font-face{
     font-family: Aller;
     src:url(fonts/Aller_Lt.ttf);
-    font-size:large;
+    font-size:12px;
 }
 *{
     font-family: Aller;
-    font-size: 18px;
+    font-size: 12px;
 }
 body { 
 	margin: 0; 
@@ -38,10 +38,7 @@ body {
       width: 1350px;
       height: 550px;
  }
-.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
+
 
 .link {
   stroke: #999;

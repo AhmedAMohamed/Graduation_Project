@@ -1,4 +1,4 @@
-function getNodeByOurId(our_id){
+function getNodeByOurId(our_id, nodes){
 	for(var i in nodes){
 		if(nodes[i].our_id === our_id){
 			return nodes[i];
@@ -10,19 +10,37 @@ function buildPathsDatasetFromJson(){
 	var paths = [];
 	for(var i in nodes){
 		if(nodes[i].paths !== undefined){
-			console.log("nodesDataset: nodes[i].paths: " + nodes[i].paths + ", i: " + i);
 			for(var j in nodes[i].paths){
 				var pathData = {};
 				pathData.source = parseInt(nodes[i].our_id);
 				pathData.target = nodes[i].paths[j];
-				console.log("pathData.target: " + pathData.target);
+				
 				paths.push(pathData);
 			}
 		}
 	}
 	var pathsDataset = {};
 	pathsDataset.paths = paths;
-	console.log("pathsDataset: " + JSON.stringify(pathsDataset, null, 4));
+	//console.log("pathsDataset: " + JSON.stringify(pathsDataset, null, 4));
+	return pathsDataset;
+}
+
+function buildPathsDatasetFromMultiLevel(nodes2){
+	var paths = [];
+	for(var i in nodes2){
+		if(nodes2[i].paths !== undefined){
+			for(var j in nodes2[i].paths){
+				var pathData = {};
+				pathData.source = parseInt(nodes[i].our_id);
+				pathData.target = nodes[i].paths[j];
+				
+				paths2.push(pathData);
+			}
+		}
+	}
+	var pathsDataset = {};
+	pathsDataset.paths = paths;
+	//console.log("pathsDataset: " + JSON.stringify(pathsDataset, null, 4));
 	return pathsDataset;
 }
 
@@ -39,8 +57,13 @@ function wrapNode(thisText, width) {
       line = [],
       lineHeight = 1.1, // ems
       y = text.attr("y"),
-      dy = parseFloat(text.attr("dy")),
-      tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+      dy;
+       if (text.attr("dy") !== null) {
+      	dy = parseFloat(text.attr("dy"));
+      }else{
+      	dy = 0;
+      }
+      tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em").attr("class", "first_tspan");
       
       lineNumber = 0,
       maxTextWidth = 0;
@@ -57,7 +80,7 @@ function wrapNode(thisText, width) {
 
         line = [word];
         tspan = text.append("tspan").attr("x", 0).attr("y", y)
-        		.attr("dy", 1) //height
+        		.attr("dy", 15) //height
         		.text(word);
 
         lineNumber++;
@@ -68,7 +91,7 @@ function wrapNode(thisText, width) {
     
     d3.select(thisText.parentNode.children[0]).attr('height', 19 * (lineNumber+1));
 
-    return calculateLeafRadius(maxTextWidth, lineNumber);
+    return [maxTextWidth, lineNumber];
 }
 
 function wrap(text, width) {
