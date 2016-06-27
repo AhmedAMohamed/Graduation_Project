@@ -1,9 +1,7 @@
 package clg.gradProject;
 
 import edu.stanford.nlp.trees.Tree;
-import is2.transitionR6j.Tagger2;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -206,7 +204,7 @@ public class SEPTBuilder {
 			if (node.parseTreeNode.value().contains("VP")) {
 				after = true;
 			}
-			if (node.parseTreeNode.value().contains("NP") && after) {
+			if ((node.parseTreeNode.value().contains("NP") || node.parseTreeNode.value().contains("ADJP")) && after) {
 				return node;
 			}
 			else {
@@ -221,4 +219,29 @@ public class SEPTBuilder {
 		return null;
 	}
 
+	public static Node getLeaf(Node node) {
+		if (node.wordIndex != -1) {
+			return node;
+		}
+		for (int i = 0; i < node.children.length; i++) {
+			Node n = node.children[i];
+			getLeaf(n);
+		}
+		return null;
+	}
+
+	public static Node getNP(Node requestedNode) {
+		if (requestedNode.parseTreeNode.value().contains("NP")) {
+			return requestedNode;
+		}
+		for (int i = 0; i < requestedNode.children.length; i++) {
+			Node n = requestedNode.children[i];
+			n = getNP(n);
+			if (n != null) {
+				return n;
+			}
+		}
+
+		return null;
+	}
 }

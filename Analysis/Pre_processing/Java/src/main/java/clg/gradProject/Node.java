@@ -13,7 +13,7 @@ public class Node {
 	public Node ref;
 	public String wordSense;
 
-	Node[] children;
+	public Node[] children;
 
 	private static int globalWordIndex = 1;
 

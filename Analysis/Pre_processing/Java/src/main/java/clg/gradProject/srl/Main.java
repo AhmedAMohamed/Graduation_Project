@@ -76,17 +76,50 @@ public class Main {
                 }
             }
             if (isArgument) {
-                if (w.partOfSpeech.startsWith("V")) {
-                    continue;
-                }
+                if (w.partOfSpeech.startsWith("V")) continue;
+                else if (w.word.contains("everyday") || w.word.contains("every")) continue;
                 else if(w.argument[argNumber].contains("AM-MOD")) continue;
                 else if(w.argument[argNumber].contains("R-A0")) continue;
+                else if (w.partOfSpeech.contains("PP") || w.partOfSpeech.contains("IN") || w.partOfSpeech.contains("TO")) {
+                    Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
+                    Node argRootNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
+                    Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argRootNode);
+                    requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
+                    requestedNode = SEPTBuilder.getNP(requestedNode);
+                    String value = requestedNode.parseTreeNode.pennString();
+                    String[] values = value.split(" ");
+                    value = "";
+                    for (int i = 0; i < values.length; i++) {
+                        values[i] = values[i].trim();
+                        if (values[i].endsWith(")")) {
+                            value += values[i].substring(0, values[i].indexOf(')')) + " ";
+                        }
+                    }
+                    value = value.trim();
+                    value = value.toLowerCase();
+                    // parse the request node value
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, value, value, w.argument, w.argument[argNumber]);
+                    arguments.add(a);
+
+                }
                 else if(!w.partOfSpeech.startsWith("N")) {
                     Node rootNode = SEPTBuilder.getSentenceByIndex(w.sentenceNumber);
                     Node argNode = SEPTBuilder.getNodeByWordIndex(rootNode, w.wordNumber);
                     Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
                     requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
-                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), requestedNode.parseTreeNode.pennString(), w.argument, w.argument[argNumber]);
+                    String value = requestedNode.parseTreeNode.pennString();
+                    String[] values = value.split(" ");
+                    value = "";
+                    for (int i = 0; i < values.length; i++) {
+                        values[i] = values[i].trim();
+                        if (values[i].endsWith(")")) {
+                               value += values[i].substring(0, values[i].indexOf(')')) + " ";
+                        }
+                    }
+                    value = value.trim();
+                    value = value.toLowerCase();
+                    // parse the request node value
+                    ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, value, value, w.argument, w.argument[argNumber]);
                     arguments.add(a);
                 }
                 else {
@@ -96,12 +129,24 @@ public class Main {
                     Node requestedNode = SEPTBuilder.getNodeParent(rootNode, argNode);
                     requestedNode = SEPTBuilder.getNodeParent(rootNode, requestedNode, true);
                     String value = requestedNode.parseTreeNode.pennString();
+                    String[] values = value.split(" ");
+                    value = "";
+                    for (int i = 0; i < values.length; i++) {
+                        values[i] = values[i].trim();
+                        if (values[i].endsWith(")")) {
+                            value += values[i].substring(0, values[i].indexOf(')')) + " ";
+                        }
+                    }
+                    value = value.trim();
+                    value = value.toLowerCase();
+
+                    // parse the value
                     if (value.contains("(CC and)")) {
-                        String[] values = value.split("(CC and)");
-                        ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values[0], w.argument, w.argument[argNumber]);
+                        String[] values_2 = value.split("(CC and)");
+                        ArgumentBuilder a = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values_2[0], w.argument, w.argument[argNumber]);
                         arguments.add(a);
 
-                        ArgumentBuilder a2 = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values[1], w.argument, w.argument[argNumber]);
+                        ArgumentBuilder a2 = new ArgumentBuilder(w.sentenceNumber, w.wordNumber, requestedNode.parseTreeNode.nodeString(), values_2[1], w.argument, w.argument[argNumber]);
                         arguments.add(a2);
                     }
                     else {
@@ -137,6 +182,9 @@ public class Main {
                 for (int j = 0; j < args.size(); j++) {
                     ArgumentBuilder word = args.get(j);
                     Node node = SEPTBuilder.getNodeByWordIndex(SEPTBuilder.getSentenceByIndex(word.sentenceNumber), word.wordNumber);
+                    if (node.wordIndex == -1 || node.parseTreeNode.pennString().contains("(")) {
+                        node = SEPTBuilder.getLeaf(node);
+                    }
                     if (node != null) {
                         if (node.ref != null) {
                             ArgumentBuilder correctArg = findArgument(node.ref.parseTreeNode.value());
@@ -152,6 +200,7 @@ public class Main {
     }
 
     private static ArgumentBuilder findArgument(String corefValue) {
+        corefValue = corefValue.toLowerCase();
         for (FrameBuilder frame : frames) {
             for (String argType : frame.arguments.keySet()) {
                 ArrayList<ArgumentBuilder> args = frame.arguments.get(argType);
@@ -167,25 +216,40 @@ public class Main {
 
     public static DMRGraph generateTree(String input) throws Throwable, IOException, CloneNotSupportedException, ClassNotFoundException {
         frames = new ArrayList();
+        DMRGraph multiLevelGraph = null;
+
         buildDMRStepOne(input);
-        enchanceFrames();
         DMRGraph singleLevelGraph = new DMRGraph(frames);
         singleLevelGraph.createGraph();
-
-        singleLevelGraph.addLinkingActionFrames(2);
+        singleLevelGraph.addLinkingActionFrames(SEPTBuilder.SEPTs.size() + 1);
+        enchanceFrames();
 
         singleLevelGraph.setScores(singleLevelGraph.ActionFrames);
-
-        KMeans clusters = new KMeans(singleLevelGraph, 2);
-
-        double tt = clusters.validity();
-        System.out.println(tt);
-        DMRGraph multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
-        calculateMultiLevelScore(multiLevelGraph);
-
-        System.out.println(multiLevelGraph.ArgsHash.size());
-        System.out.println(clusters.Clusters.size());
+        if (singleLevelGraph.ActionFrames.size() < 6) {
+            return singleLevelGraph;
+        } else {
+            for (int i = 6; i > 1; i--) {
+                KMeans clusters = new KMeans(singleLevelGraph, i);
+                int zeroClusters = findZeroClusters(clusters);
+                i = i - zeroClusters - 1;
+                if (i == i || i == 0) {
+                    return singleLevelGraph;
+                }
+                multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
+                calculateMultiLevelScore(multiLevelGraph);
+            }
+        }
         return multiLevelGraph;
+    }
+
+    private static int findZeroClusters(KMeans clusters) {
+        int count = 0;
+        for (ArrayList<FrameBuilder> cluster : clusters.Clusters) {
+            if (cluster.size() == 0) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static void calculateMultiLevelScore(DMRGraph multiLevelGraph) {

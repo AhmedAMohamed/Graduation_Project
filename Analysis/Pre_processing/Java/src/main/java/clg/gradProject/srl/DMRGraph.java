@@ -5,7 +5,6 @@ import clg.gradProject.FrameBuilder;
 import clg.gradProject.Node;
 import clg.gradProject.SEPTBuilder;
 
-import javax.xml.parsers.FactoryConfigurationError;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -79,7 +78,7 @@ public class DMRGraph {
 					}
 					ArrayList list = argIt.relatedFrames.get(ArgPair.getKey());
 					if(list == null) {
-						argIt.relatedFrames.put(ArgPair.getKey(), new ArrayList<String>());
+						argIt.relatedFrames.put(ArgPair.getKey(), new ArrayList());
 						list = argIt.relatedFrames.get(ArgPair.getKey());
 					}
 					list.add(ActionFrame.frameID);
@@ -137,17 +136,47 @@ public class DMRGraph {
 
 			Node verbNode = SEPTBuilder.findNodeByPOS(sentRoot, "VB", 1, sentRoot.sentIndex);
 			if (verbNode != null) {
-				FrameBuilder frame = new FrameBuilder(verbNode.parseTreeNode.pennString(), verbNode.sentIndex, verbNode.wordIndex, verbNode.parseTreeNode.value(), verbNode.parseTreeNode.pennString(), 3);
+				String value = verbNode.parseTreeNode.pennString();
+				String[] values = value.split(" ");
+				value = "";
+				for (int i = 0; i < values.length; i++) {
+					values[i] = values[i].trim();
+					if (values[i].endsWith(")")) {
+						value += values[i].substring(0, values[i].indexOf(')')) + " ";
+					}
+				}
+				value = value.trim();
+				value = value.toLowerCase();
+
+				FrameBuilder frame = new FrameBuilder(value, verbNode.sentIndex, verbNode.wordIndex, verbNode.parseTreeNode.value(), value, 3);
 
 				Node subjectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 0, sentRoot.sentIndex);
+
+				subjectArgNode.wordIndex = 1;
 				if (subjectArgNode != null) {
 					ArrayList<ArgumentBuilder> a0Args = addCustomeArgs(subjectArgNode, true);
 					frame.arguments.put("A0", a0Args);
-
+					if (!ArgsHash.containsKey(a0Args.get(0))) {
+						ArgsHash.put(a0Args.get(0).word, a0Args.get(0));
+					}
+					if (a0Args.size() > 1) {
+						if (!ArgsHash.containsKey(a0Args.get(1))) {
+							ArgsHash.put(a0Args.get(1).word, a0Args.get(1));
+						}
+					}
 					Node objectArgNode = SEPTBuilder.findNodeByPOS(sentRoot, "NP", 2, sentRoot.sentIndex);
+					objectArgNode.wordIndex = 3;
 					if (objectArgNode != null) {
 						ArrayList<ArgumentBuilder> a1Args = addCustomeArgs(objectArgNode, false);
 						frame.arguments.put("A1", a1Args);
+						if (!ArgsHash.containsKey(a1Args.get(0))) {
+							ArgsHash.put(a1Args.get(0).word, a1Args.get(0));
+						}
+						if (a0Args.size() > 1) {
+							if (!ArgsHash.containsKey(a1Args.get(1))) {
+								ArgsHash.put(a1Args.get(1).word, a1Args.get(1));
+							}
+						}
 						this.ActionFrames.add(frame);
 					}
 				}
@@ -166,12 +195,23 @@ public class DMRGraph {
 		}
 		ArrayList<ArgumentBuilder> args  = new ArrayList();
 		String value = argNode.parseTreeNode.pennString();
+		String[] values = value.split(" ");
+		value = "";
+		for (int i = 0; i < values.length; i++) {
+			values[i] = values[i].trim();
+			if (values[i].endsWith(")")) {
+				value += values[i].substring(0, values[i].indexOf(')')) + " ";
+			}
+		}
+		value = value.trim();
+		value = value.toLowerCase();
+
 		if (value.contains("(CC and)")) {
-			String[] values = value.split("(CC and)");
-			ArgumentBuilder a = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values[0], types, types[0]);
+			String[] values_2 = value.split("(CC and)");
+			ArgumentBuilder a = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values_2[0], types, types[0]);
 			args.add(a);
 
-			ArgumentBuilder a2 = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values[1], types, types[0]);
+			ArgumentBuilder a2 = new ArgumentBuilder(argNode.sentIndex, argNode.wordIndex, argNode.parseTreeNode.nodeString(), values_2[1], types, types[0]);
 			args.add(a2);
 		}
 		else {

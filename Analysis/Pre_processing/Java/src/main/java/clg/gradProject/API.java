@@ -80,8 +80,8 @@ public class API {
 	}
 
 	public static void main(String[] args) throws Throwable,  Exception{
-        StartRPCClient();
-//        genTree("the college boy who danced. ");
+        //StartRPCClient();
+        genTree("John eats pizza. It was delicious. He eats and goes to the park. He meets sam at the park. Sam gives john a book. John speaks with native people. John studies japanese with sam.");
 
     }
 
