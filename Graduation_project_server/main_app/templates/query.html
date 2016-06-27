@@ -210,7 +210,8 @@ function update(){
 				    },
 				    async: false
 				});
-				console.log('for name ' + d.name + ': ' + d.image);
+
+				console.log('root: ' + JSON.stringify(root, null, 4));
 		      	return d.image ? d.image: "";
 		      })
 		      .attr("width", 40)
