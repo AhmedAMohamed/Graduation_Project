@@ -81,8 +81,7 @@ public class API {
 
 	public static void main(String[] args) throws Throwable,  Exception{
         //StartRPCClient();
-        genTree("John eats pizza. It was delicious. He eats and goes to the park. He meets sam at the park. Sam gives john a book. John speaks with native people. John studies japanese with sam.");
-
+        genTree("Shakespeare was a great writer. Shakespeare is known of writing plays. Shakespeare lived in stanford. Shakespeare had four children. Shakespeare played football. Shakespeare married samantha.");
     }
 
     public static void StartRPCClient() throws Throwable, Exception {

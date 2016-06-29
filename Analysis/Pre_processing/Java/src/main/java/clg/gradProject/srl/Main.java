@@ -225,19 +225,22 @@ public class Main {
         enchanceFrames();
 
         singleLevelGraph.setScores(singleLevelGraph.ActionFrames);
-        if (singleLevelGraph.ActionFrames.size() < 6) {
+        if (singleLevelGraph.ActionFrames.size() < 10) {
             return singleLevelGraph;
         } else {
-            for (int i = 6; i > 1; i--) {
-                KMeans clusters = new KMeans(singleLevelGraph, i);
+            //for (int i = 4; i > 1; i--) {
+                KMeans clusters = new KMeans(singleLevelGraph, 3);
                 int zeroClusters = findZeroClusters(clusters);
-                i = i - zeroClusters - 1;
-                if (i == i || i == 0) {
-                    return singleLevelGraph;
-                }
+
+                //MeaningDistance meanining = new MeaningDistance(clusters.Clusters);
+                //HierarchicalNew x = new HierarchicalNew(multiLevelGraph, meanining);
+            //    i = i - zeroClusters - 1;
+            //    if (i == 1 || i == 0) {
+            //        return singleLevelGraph;
+            //    }
                 multiLevelGraph = new DMRGraph(singleLevelGraph, clusters.Clusters);
                 calculateMultiLevelScore(multiLevelGraph);
-            }
+            //}
         }
         return multiLevelGraph;
     }

@@ -110,8 +110,14 @@ public class DMRGraph {
 			ArgumentBuilder argObject = ArgsHash.get(argWord);
 			double score = 0;
 			for(String argType : argObject.relatedFrames.keySet()) {
-				ArrayList<String> frames = argObject.relatedFrames.get(argType);
-				score += 5 * frames.size();
+				if (argType.contains("A0")) {
+					ArrayList<String> frames = argObject.relatedFrames.get(argType);
+					score += 10 * frames.size();
+				}
+				else {
+					ArrayList<String> frames = argObject.relatedFrames.get(argType);
+					score += 5 * frames.size();
+				}
 			}
 			argObject.score = score;
 		}
@@ -157,10 +163,16 @@ public class DMRGraph {
 					ArrayList<ArgumentBuilder> a0Args = addCustomeArgs(subjectArgNode, true);
 					frame.arguments.put("A0", a0Args);
 					if (!ArgsHash.containsKey(a0Args.get(0))) {
+						ArrayList<String> frames_ids = new ArrayList();
+						frames_ids.add(frame.frameID);
+						a0Args.get(0).relatedFrames.put("A0", frames_ids);
 						ArgsHash.put(a0Args.get(0).word, a0Args.get(0));
 					}
 					if (a0Args.size() > 1) {
 						if (!ArgsHash.containsKey(a0Args.get(1))) {
+							ArrayList<String> frames_ids = new ArrayList();
+							frames_ids.add(frame.frameID);
+							a0Args.get(1).relatedFrames.put("A0", frames_ids);
 							ArgsHash.put(a0Args.get(1).word, a0Args.get(1));
 						}
 					}
@@ -170,10 +182,16 @@ public class DMRGraph {
 						ArrayList<ArgumentBuilder> a1Args = addCustomeArgs(objectArgNode, false);
 						frame.arguments.put("A1", a1Args);
 						if (!ArgsHash.containsKey(a1Args.get(0))) {
+							ArrayList<String> frames_ids = new ArrayList();
+							frames_ids.add(frame.frameID);
+							a1Args.get(0).relatedFrames.put("A1", frames_ids);
 							ArgsHash.put(a1Args.get(0).word, a1Args.get(0));
 						}
 						if (a0Args.size() > 1) {
 							if (!ArgsHash.containsKey(a1Args.get(1))) {
+								ArrayList<String> frames_ids = new ArrayList();
+								frames_ids.add(frame.frameID);
+								a1Args.get(1).relatedFrames.put("A1", frames_ids);
 								ArgsHash.put(a1Args.get(1).word, a1Args.get(1));
 							}
 						}

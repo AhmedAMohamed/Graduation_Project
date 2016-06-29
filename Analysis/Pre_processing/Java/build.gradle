@@ -21,8 +21,10 @@ dependencies {
     compile name: 'rabbitmq-client'
     compile name: 'stanford-corenlp-3.5.2'
     compile name: 'gson-2.2.2'
+    compile name: 'jwnl'
     runtime name: 'stanford-corenlp-3.5.2-models'
     runtime name: 'ejml-0.23'
     runtime name: 'anna-3.3'
     runtime name: 'liblinear-java-1.95'
+    runtime name: 'commons-logging'
 }
