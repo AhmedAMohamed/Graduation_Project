@@ -212,7 +212,7 @@ function getJSONFromFrames (original_frames, level, id_counter, score_average) {
               if (argument.word[0] == '(') {
                 argument.word = parseParseTree(argument.word);
               }
-              if (argument.argumentType == 'A0') {
+              if (argument_type == 'A0') {
                 if (argument.word == link_word) {
                   console.log('\t\targument is A0 and link word: ' + argument.word);
                   nodes_dict[link_word].children.push(nodes_dict[frame.word]);
@@ -233,11 +233,11 @@ function getJSONFromFrames (original_frames, level, id_counter, score_average) {
                 }
               } else {
                 if (argument.word == link_word) {
-                  console.log('\t\targument is ' + argument.argumentType +'  and link word: ' + argument.word);
+                  console.log('\t\targument is ' + argument_type +'  and link word: ' + argument.word);
                   nodes_dict[frame.word].is_passive = true;
                   nodes_dict[link_word].children.push(nodes_dict[frame.word]);
                 } else {
-                  console.log('\t\targument is ' + argument.argumentType +'  and not link word: ' + argument.word);
+                  console.log('\t\targument is ' + argument.argument_type +'  and not link word: ' + argument.word);
                   if (nodes_dict[argument.word]) {
                     var paths = nodes_dict[frame.word].paths;
                     if (paths) {

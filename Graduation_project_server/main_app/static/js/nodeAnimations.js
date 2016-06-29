@@ -1,7 +1,12 @@
 function mousemoveNodes(){
-    d3.select(this).select("circle").style("fill", "#6DA69E")
+    d3.select(this).select("circle").style("fill", function(d){
+      if(d.level_2){ return "#A51927"; }
+      else{ return "#6DA69E"; }
+    })
     d3.select(this).select("text").style("fill", function(d){
-      return d.root1? "#ffffff":"#264F5C";
+      if(d.root1){ return "#ffffff"; }
+                else if(d.level_2) { return "#ffffff"; }
+                else return "#264F5C";
     })
 
     if(d3.select(this)[0][0].__data__._children && d3.select(this)[0][0].__data__._children.length > 0){ 
@@ -12,7 +17,10 @@ function mousemoveNodes(){
   }
 
   function mouseoutNodes(){
-    d3.select(this).select("circle").style("fill", "#264F5C")
+    d3.select(this).select("circle").style("fill", function(d){
+      if(d.level_2){ return "#DA555C"; }
+      else{ return "#264F5C"; }
+    })
     d3.select(this).select("text").style("fill", "#ffffff")
 
     if(d3.select(this)[0][0].__data__._children && d3.select(this)[0][0].__data__._children.length > 0){ 
@@ -24,7 +32,7 @@ function mousemoveNodes(){
 
 
 
-function collide(alpha) {
+function collide(alpha, nodes, padding) {
   var quadtree = d3.geom.quadtree(nodes);
   return function(d) {
 
